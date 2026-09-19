@@ -19,26 +19,26 @@ public enum SonderMark {
     public static let swooshWidth: CGFloat = 0.156
 
     /// Centre of the bezel, and its radius, as fractions of the tile.
-    public static let bezelCentre = CGPoint(x: 0.49, y: 0.48)
-    public static let bezelRadius: CGFloat = 0.196
-    public static let bezelWidth: CGFloat = 0.016
+    public static let bezelCentre = CGPoint(x: 0.500, y: 0.475)
+    public static let bezelRadius: CGFloat = 0.176
+    public static let bezelWidth: CGFloat = 0.020
     /// The bezel is filled before it is stroked, so the needle sits on a clean
     /// disc rather than on whatever part of the swoosh happens to pass behind.
     public static let bezelFillInset: CGFloat = 0.012
 
     /// The needle's box, centred on the bezel.
-    public static let needleSize: CGFloat = 0.168
+    public static let needleSize: CGFloat = 0.155
 
     // MARK: Tones
 
     /// Near-black, not black: the tile keeps a little warmth against a pure
     /// white home screen, and gives the swoosh somewhere to sit.
-    public static let tile: UInt32 = 0x151517
+    public static let tile: UInt32 = 0x0D0D0E
     /// Barely lighter than the tile. The swoosh is meant to be *found*, not
     /// announced — raising this contrast is the fastest way to lose the mark.
-    public static let swoosh: UInt32 = 0x2A2A2E
-    public static let bezel: UInt32 = 0x63636B
-    public static let needle: UInt32 = 0xA9A9B0
+    public static let swoosh: UInt32 = 0x333336
+    public static let bezel: UInt32 = 0x4C4C50
+    public static let needle: UInt32 = 0x525258
 
     // MARK: Paths
 
