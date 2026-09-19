@@ -1,12 +1,3 @@
 #!/bin/sh
-# The app icon is generated, never hand-drawn, so it always matches the mark in
-# Sonder/Design/MarkGeometry.swift. Re-run after changing that file.
-set -e
-root=$(cd "$(dirname "$0")/.." && pwd)
-tmp=$(mktemp -d)
-swiftc -O -sdk "$(xcrun --show-sdk-path --sdk macosx)" \
-    "$root/Sonder/Design/MarkGeometry.swift" \
-    "$root/Tools/RenderIcon.swift" \
-    -o "$tmp/render-icon"
-"$tmp/render-icon" "$root/Sonder/Assets.xcassets/AppIcon.appiconset/AppIcon.png"
-rm -rf "$tmp"
+# Regenerate the app icon and the in-app mark from Art/sonder-mark-source.png.
+exec python3 "$(dirname "$0")/render-icon.py"

@@ -1,0 +1,99 @@
+import Foundation
+
+struct ItineraryItem: Identifiable, Hashable {
+    enum Kind: String {
+        case flight, stay, activity, food
+
+        var symbol: String {
+            switch self {
+            case .flight: "airplane"
+            case .stay: "bed.double"
+            case .activity: "figure.walk"
+            case .food: "fork.knife"
+            }
+        }
+    }
+
+    let id = UUID()
+    let time: String
+    let title: String
+    let kind: Kind
+}
+
+struct ItineraryDay: Identifiable, Hashable {
+    var id: Int { number }
+    let number: Int
+    let date: Date
+    let items: [ItineraryItem]
+}
+
+extension ItineraryDay {
+    /// A plan built from the trip's own shape: arrival on the first day,
+    /// departure on the last, and something to do in between. Deterministic,
+    /// for the same reason `Flight.options` is.
+    static func plan(for trip: Trip) -> [ItineraryDay] {
+        let calendar = Calendar.current
+        let days = max(calendar.dateComponents([.day], from: trip.start, to: trip.end).day ?? 1, 1)
+        var seed = UInt64(truncatingIfNeeded: trip.destination.rawValue.hashValue)
+        func next(_ bound: Int) -> Int {
+            seed = seed &* 6364136223846793005 &+ 1442695040888963407
+            return Int((seed >> 33) % UInt64(max(bound, 1)))
+        }
+
+        let outings = trip.destination.outings
+        let meals = ["Breakfast nearby", "Long lunch", "Dinner booked", "Street food crawl"]
+
+        return (0...days).map { d in
+            let date = calendar.date(byAdding: .day, value: d, to: trip.start) ?? trip.start
+            var items: [ItineraryItem] = []
+
+            if d == 0 {
+                items.append(.init(time: "09:40", title: "Fly to \(trip.destination.airport)", kind: .flight))
+                items.append(.init(time: "16:20", title: "Check in", kind: .stay))
+                items.append(.init(time: "19:30", title: meals[next(meals.count)], kind: .food))
+            } else if d == days {
+                items.append(.init(time: "10:00", title: "Check out", kind: .stay))
+                items.append(.init(time: "14:15", title: "Fly home", kind: .flight))
+            } else {
+                items.append(.init(time: "09:00", title: meals[0], kind: .food))
+                items.append(.init(time: "10:30", title: outings[next(outings.count)], kind: .activity))
+                items.append(.init(time: "13:30", title: meals[1 + next(meals.count - 1)], kind: .food))
+                if next(3) != 0 {
+                    items.append(.init(time: "16:00", title: outings[next(outings.count)], kind: .activity))
+                }
+            }
+            return ItineraryDay(number: d + 1, date: date, items: items)
+        }
+    }
+}
+
+private extension Destination {
+    var outings: [String] {
+        switch self {
+        case .kyoto: ["Kiyomizu-dera at opening", "Fushimi Inari before the crowd",
+                      "Philosopher's Path", "Nishiki Market", "Arashiyama bamboo"]
+        case .lisbon: ["Tram 28 end to end", "Belém Tower", "Alfama on foot",
+                       "LX Factory", "Miradouro at golden hour"]
+        case .fuji: ["Lake Kawaguchi loop", "Chureito Pagoda", "Onsen with a view",
+                     "Oshino Hakkai springs"]
+        case .banff: ["Moraine Lake canoe", "Johnston Canyon", "Sulphur Mountain gondola",
+                      "Lake Louise shoreline"]
+        case .santorini: ["Oia at sunset", "Red Beach", "Akrotiri ruins",
+                          "Caldera boat trip", "Winery tasting"]
+        case .iceland: ["Goðafoss", "Seljalandsfoss walk-behind", "Black sand at Reynisfjara",
+                        "Blue Lagoon", "Northern lights drive"]
+        case .norway: ["Reine viewpoint", "Kayak the fjord", "Haukland beach",
+                       "Fishing village walk"]
+        case .queenstown: ["Skyline gondola", "Milford Sound day trip", "Bungy at Kawarau",
+                           "Lake Wakatipu cruise"]
+        case .hallstatt: ["Salt mine tour", "Skywalk viewpoint", "Boat across the lake",
+                          "Dachstein ice caves"]
+        case .marrakesh: ["Jemaa el-Fnaa after dark", "Bahia Palace", "Majorelle Garden",
+                          "Souk without a map", "Hammam"]
+        case .dolomites: ["Tre Cime loop", "Seceda ridgeline", "Lago di Braies at dawn",
+                          "Alpe di Siusi"]
+        case .cappadocia: ["Balloon at sunrise", "Göreme open-air museum",
+                           "Red Valley hike", "Underground city", "Pottery in Avanos"]
+        }
+    }
+}

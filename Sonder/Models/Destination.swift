@@ -51,6 +51,46 @@ enum Destination: String, CaseIterable, Identifiable {
         }
     }
 
+    /// The airport a trip here flies into. Used to build flight results and the
+    /// itinerary's first line.
+    var airport: String {
+        switch self {
+        case .kyoto: "KIX"
+        case .lisbon: "LIS"
+        case .fuji: "HND"
+        case .banff: "YYC"
+        case .santorini: "JTR"
+        case .iceland: "KEF"
+        case .norway: "SVJ"
+        case .queenstown: "ZQN"
+        case .hallstatt: "SZG"
+        case .marrakesh: "RAK"
+        case .dolomites: "VCE"
+        case .cappadocia: "ASR"
+        }
+    }
+
+    /// Just the city, for places where the country would be repetition.
+    var city: String { String(title.prefix(while: { $0 != "," })) }
+
+    /// A line of the pitch, shown on the detail screen under the title.
+    var blurb: String {
+        switch self {
+        case .kyoto: "Seventeen World Heritage sites and the best walking city in Japan."
+        case .lisbon: "Seven hills, one river, and tram 28 doing all the work."
+        case .fuji: "Clearest from the five lakes, and clearest in the morning."
+        case .banff: "Glacial lakes that photograph like someone turned up the saturation."
+        case .santorini: "The caldera at sunset is worth the crowd. Just about."
+        case .iceland: "Waterfalls you can walk behind, an hour from the airport."
+        case .norway: "Above the Arctic Circle, and green until October."
+        case .queenstown: "The adventure capital, surrounded by a lake shaped like a Z."
+        case .hallstatt: "Ninety minutes from Salzburg and worth every one of them."
+        case .marrakesh: "Get lost in the medina on purpose. Everyone does."
+        case .dolomites: "Limestone that turns pink twice a day."
+        case .cappadocia: "Be in a balloon basket before sunrise or don't bother."
+        }
+    }
+
     /// What the card calls the place — city first, then country, as the design
     /// sets it.
     var title: String {

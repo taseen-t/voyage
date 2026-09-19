@@ -3,6 +3,10 @@ import SwiftUI
 struct HomeView: View {
     @Bindable var model: AppModel
 
+    /// Drives the list's entrance. Reset on tab change so switching tabs deals
+    /// the new cards in rather than swapping them silently.
+    @State private var shown = false
+
     var body: some View {
         ZStack(alignment: .bottom) {
             Color.surface.ignoresSafeArea()
@@ -13,11 +17,18 @@ struct HomeView: View {
                 // all eagerly is the difference between a smooth first scroll
                 // and a stutter.
                 LazyVStack(spacing: 16) {
-                    ForEach(trips) { trip in
-                        TripCard(trip: trip,
-                                 onSave: { Haptics.tap(); model.toggleSaved(trip) },
-                                 onOpen: { Haptics.tap() },
-                                 onBook: { Haptics.tap() })
+                    ForEach(Array(trips.enumerated()), id: \.element.id) { i, trip in
+                        TripCard(
+                            trip: trip,
+                            onSave: { Haptics.tap(); model.toggleSaved(trip) },
+                            onOpen: { open(.detail(trip)) },
+                            onBook: { open(.flights(trip)) }
+                        )
+                        .onTapGesture { open(.detail(trip)) }
+                        .opacity(shown ? 1 : 0)
+                        .offset(y: shown ? 0 : 26)
+                        .animation(.spring(response: 0.5, dampingFraction: 0.85)
+                            .delay(Double(min(i, 6)) * 0.06), value: shown)
                     }
                     if trips.isEmpty { emptyState }
                 }
@@ -30,9 +41,42 @@ struct HomeView: View {
             bottomFade
             addButton
         }
+        .onAppear { shown = true }
+        .onChange(of: model.tab) { _, _ in
+            shown = false
+            DispatchQueue.main.async { shown = true }
+        }
+        .sheet(item: $model.route) { route in
+            switch route {
+            case .detail(let trip):
+                TripDetailView(
+                    trip: model.trips.first { $0.id == trip.id } ?? trip,
+                    onBook: { model.route = .flights(trip) },
+                    onSave: { Haptics.tap(); model.toggleSaved(trip) },
+                    onClose: { model.route = nil }
+                )
+            case .flights(let trip):
+                FlightResultsView(trip: trip, onClose: { model.route = nil })
+            case .newTrip:
+                NewTripView(
+                    onCreate: { trip in
+                        model.add(trip)
+                        model.route = nil
+                    },
+                    onClose: { model.route = nil }
+                )
+            case .profile:
+                ProfileView(model: model, onClose: { model.route = nil })
+            }
+        }
     }
 
     private var trips: [Trip] { model.trips(for: model.tab) }
+
+    private func open(_ route: AppModel.Route) {
+        Haptics.tap()
+        model.route = route
+    }
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 2) {
@@ -56,10 +100,13 @@ struct HomeView: View {
                 // The system's own person glyph rather than a bundled portrait:
                 // there is no account behind this screen yet, and a stock face
                 // would imply one.
-                Image(systemName: "person.crop.circle.fill")
-                    .font(.system(size: 31))
-                    .foregroundStyle(Color.inkFaint, Color.fieldFill)
-                    .accessibilityLabel("Account")
+                Button { open(.profile) } label: {
+                    Image(systemName: "person.crop.circle.fill")
+                        .font(.system(size: 31))
+                        .foregroundStyle(Color.inkFaint, Color.fieldFill)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Account")
             }
 
             Text(TripFormat.header.string(from: .now))
@@ -89,9 +136,7 @@ struct HomeView: View {
     }
 
     private var addButton: some View {
-        Button {
-            Haptics.confirm()
-        } label: {
+        Button { open(.newTrip) } label: {
             Image(systemName: "plus")
                 .font(.system(size: 17, weight: .semibold))
                 .foregroundStyle(Color.controlLabel)

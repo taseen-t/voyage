@@ -35,6 +35,45 @@ final class AppModel {
         UserDefaults.standard.set(true, forKey: Key.onboarded)
     }
 
+    /// Sheets and pushes the home screen can present. One optional rather than
+    /// four booleans: only one of these can be up at a time, and four flags can
+    /// disagree about that while an enum cannot.
+    var route: Route?
+
+    enum Route: Identifiable, Hashable {
+        case detail(Trip)
+        case flights(Trip)
+        case newTrip
+        case profile
+
+        var id: String {
+            switch self {
+            case .detail(let t): "detail-\(t.id)"
+            case .flights(let t): "flights-\(t.id)"
+            case .newTrip: "new"
+            case .profile: "profile"
+            }
+        }
+    }
+
+    func add(_ trip: Trip) {
+        trips.append(trip)
+        tab = trip.isUpcoming() ? .upcoming : .past
+    }
+
+    /// Back to a first launch. The only thing that survives a relaunch is the
+    /// onboarding flag, so this is the whole of it.
+    func reset() {
+        UserDefaults.standard.removeObject(forKey: Key.onboarded)
+        hasOnboarded = false
+        trips = Trip.sample
+        email = ""
+        onboardingPage = 0
+        route = nil
+        tab = .upcoming
+        step = .onboarding
+    }
+
     func toggleSaved(_ trip: Trip) {
         guard let i = trips.firstIndex(where: { $0.id == trip.id }) else { return }
         trips[i].isSaved.toggle()

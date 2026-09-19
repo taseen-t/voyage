@@ -31,8 +31,12 @@ struct OnboardingView: View {
     @Bindable var model: AppModel
     var onFinish: () -> Void
 
+    /// Drives the card deal on page 1. Set once the view is on screen, and
+    /// cleared when the page is left, so returning to it deals again.
+    @State private var dealt = false
+
     var body: some View {
-        ZStack {
+        ZStack(alignment: .top) {
             Color.surface.ignoresSafeArea()
 
             VStack(spacing: 0) {
@@ -66,29 +70,96 @@ struct OnboardingView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 .padding(.horizontal, Metrics.gutter)
-                .padding(.bottom, 26)
+                .padding(.bottom, 22)
                 // Re-fading the copy on each page keeps the eye on the words
                 // while the illustration slides underneath it.
                 .id(model.onboardingPage)
-                .transition(.opacity)
+                .transition(.opacity.combined(with: .offset(y: 8)))
+
+                dots.padding(.bottom, 18)
 
                 Button(current.action, action: advance)
                     .buttonStyle(PrimaryButtonStyle())
                     .padding(.horizontal, Metrics.gutter)
                     .padding(.bottom, 8)
             }
+
+            header
+        }
+        .onAppear { deal(true) }
+        .onChange(of: model.onboardingPage) { _, page in
+            // Page one deals every time it is reached, forwards or back.
+            deal(page == 0)
         }
     }
 
     private var current: OnboardingPage { OnboardingPage.all[model.onboardingPage] }
 
+    /// Back, and a skip straight to the end. Both are hidden on the first page
+    /// rather than disabled — a back arrow with nothing behind it is a control
+    /// that answers "no" to the only question it raises.
+    private var header: some View {
+        HStack {
+            if model.onboardingPage > 0 {
+                Button(action: back) {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(Color.ink)
+                        .frame(width: 38, height: 38)
+                        .background(Color.fieldFill, in: Circle())
+                }
+                .buttonStyle(.plain)
+                .transition(.opacity.combined(with: .scale(scale: 0.8)))
+                .accessibilityLabel("Back")
+            }
+
+            Spacer()
+
+            if model.onboardingPage < OnboardingPage.all.count - 1 {
+                Button("Skip") {
+                    Haptics.tap()
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        model.onboardingPage = OnboardingPage.all.count - 1
+                    }
+                }
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(Color.inkFaint)
+                .buttonStyle(.plain)
+                .transition(.opacity)
+            }
+        }
+        .padding(.horizontal, Metrics.gutter)
+        .animation(.easeInOut(duration: 0.22), value: model.onboardingPage)
+    }
+
+    private var dots: some View {
+        HStack(spacing: 6) {
+            ForEach(OnboardingPage.all) { page in
+                Capsule()
+                    .fill(page.id == model.onboardingPage ? Color.ink : Color.hairline)
+                    .frame(width: page.id == model.onboardingPage ? 18 : 6, height: 6)
+                    .animation(.spring(response: 0.36, dampingFraction: 0.75),
+                               value: model.onboardingPage)
+            }
+        }
+        .accessibilityHidden(true)
+    }
+
     @ViewBuilder
     private func illustration(for page: Int) -> some View {
         switch page {
-        case 0: StackedCardsIllustration()
+        case 0: StackedCardsIllustration(deal: dealt)
         case 1: RouteMapIllustration()
         default: ScatterIllustration()
         }
+    }
+
+    /// Resetting to `false` first is what makes the deal replay: a spring
+    /// animating to the value it already holds does nothing at all.
+    private func deal(_ on: Bool) {
+        guard on else { dealt = false; return }
+        dealt = false
+        DispatchQueue.main.async { dealt = true }
     }
 
     private func advance() {
@@ -98,6 +169,11 @@ struct OnboardingView: View {
         } else {
             onFinish()
         }
+    }
+
+    private func back() {
+        Haptics.tap()
+        withAnimation(.easeInOut(duration: 0.3)) { model.onboardingPage -= 1 }
     }
 }
 

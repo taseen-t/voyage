@@ -34,11 +34,6 @@ enum Palette {
     /// anything a traveller is not deciding with.
     static let accent = Pair(light: 0xF0511E, dark: 0xFF7A4A)
 
-    /// The mark's ribbon, which sits on its own dark tile in both themes.
-    static let markTile: UInt32 = 0x1D1E21
-    static let markRibbon: UInt32 = 0x6E7378
-    static let markNeedle: UInt32 = 0xFFFFFF
-
     struct Pair {
         let light: UInt32
         let dark: UInt32

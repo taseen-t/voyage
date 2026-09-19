@@ -2,9 +2,42 @@ import SwiftUI
 
 // MARK: - Page 1 — stacked cards
 
-/// Trip cards fanned over the mark. They run off the bottom of the frame on
-/// purpose: the point is that there are more of them than fit.
+/// Trip cards dealt over the mark.
+///
+/// They fly in from the left, one after another, and come to rest with the
+/// front card centred — the deck being laid out rather than the deck already
+/// laid out. The last card in the array is the one that lands last and
+/// closest to centre, so the eye finishes where the copy begins.
+///
+/// They run off the bottom of the frame on purpose: the point is that there
+/// are more of them than fit.
 struct StackedCardsIllustration: View {
+    /// Driven by the parent so the deal replays whenever this page becomes
+    /// visible again, rather than only on the very first appearance.
+    var deal: Bool
+
+    private struct Card {
+        let destination: Destination
+        let badge: String?
+        let green: Bool
+        let dates: String
+        /// Resting place and angle, as fractions of the frame's width.
+        let x: CGFloat, y: CGFloat, tilt: Double
+    }
+
+    private let cards: [Card] = [
+        .init(destination: .cappadocia, badge: nil, green: false, dates: "Mar 4 – 11, 2027",
+              x: -0.52, y: 0.21, tilt: -20),
+        .init(destination: .banff, badge: nil, green: false, dates: "Jan 9 – 18, 2027",
+              x: -0.40, y: 0.19, tilt: -16),
+        .init(destination: .santorini, badge: nil, green: false, dates: "Aug 2 – 9, 2026",
+              x: -0.30, y: 0.16, tilt: -12),
+        .init(destination: .kyoto, badge: "Today", green: true, dates: "Oct 3 – 10, 2026",
+              x: -0.14, y: 0.13, tilt: -8),
+        .init(destination: .lisbon, badge: "In 32 days", green: false, dates: "Nov 12 – 19, 2026",
+              x: 0.12, y: 0.10, tilt: -2),
+    ]
+
     var body: some View {
         GeometryReader { geo in
             let w = geo.size.width
@@ -13,24 +46,26 @@ struct StackedCardsIllustration: View {
             ZStack {
                 AppMark(side: w * 0.50)
                     .offset(x: w * 0.09, y: -w * 0.17)
+                    .opacity(deal ? 1 : 0)
+                    .scaleEffect(deal ? 1 : 0.9)
+                    .animation(.spring(response: 0.55, dampingFraction: 0.8), value: deal)
 
-                MiniTripCard(destination: .santorini, badge: nil,
-                             tint: nil, dates: "Aug 2 – 9, 2026")
-                    .frame(width: card.width, height: card.height)
-                    .rotationEffect(.degrees(-14))
-                    .offset(x: -w * 0.32, y: w * 0.16)
-
-                MiniTripCard(destination: .kyoto, badge: "Today",
-                             tint: Color(rgb: 0x2E9E5B), dates: "Oct 3 – 10, 2026")
-                    .frame(width: card.width, height: card.height)
-                    .rotationEffect(.degrees(-8))
-                    .offset(x: -w * 0.14, y: w * 0.13)
-
-                MiniTripCard(destination: .lisbon, badge: "In 32 days",
-                             tint: nil, dates: "Nov 12 – 19, 2026")
-                    .frame(width: card.width, height: card.height)
-                    .rotationEffect(.degrees(-2))
-                    .offset(x: w * 0.12, y: w * 0.10)
+                ForEach(Array(cards.enumerated()), id: \.offset) { i, c in
+                    MiniTripCard(destination: c.destination, badge: c.badge,
+                                 tint: c.green ? Color(rgb: 0x2E9E5B) : nil, dates: c.dates)
+                        .frame(width: card.width, height: card.height)
+                        .rotationEffect(.degrees(deal ? c.tilt : c.tilt - 14))
+                        // Off the left edge by more than a card's width, so a
+                        // card is never seen part-way through its own entrance.
+                        .offset(x: deal ? w * c.x : -w * 1.15,
+                                y: deal ? w * c.y : w * (c.y + 0.06))
+                        .opacity(deal ? 1 : 0)
+                        .animation(
+                            .spring(response: 0.62, dampingFraction: 0.78)
+                                .delay(0.10 + Double(i) * 0.085),
+                            value: deal
+                        )
+                }
             }
             .frame(width: w, height: geo.size.height, alignment: .center)
         }
@@ -52,7 +87,7 @@ private struct MiniTripCard: View {
                 .resizable()
                 .scaledToFill()
 
-            LinearGradient(colors: [.black.opacity(0.42), .clear],
+            LinearGradient(colors: [.black.opacity(0.46), .clear],
                            startPoint: .top, endPoint: .center)
 
             VStack(alignment: .leading, spacing: 5) {
@@ -244,6 +279,6 @@ struct ScatterIllustration: View {
     }
 }
 
-#Preview("Cards") { StackedCardsIllustration().frame(height: 380) }
+#Preview("Cards") { StackedCardsIllustration(deal: true).frame(height: 380) }
 #Preview("Route") { RouteMapIllustration().frame(height: 380) }
 #Preview("Scatter") { ScatterIllustration().frame(height: 380) }

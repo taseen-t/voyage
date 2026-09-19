@@ -58,7 +58,20 @@ extension Trip {
         calendar.startOfDay(for: end) >= calendar.startOfDay(for: now)
     }
 
-    var budgetLabel: String { "$\(budget)" }
+    var budgetLabel: String { Money.label(budget) }
+}
+
+/// Money, formatted once.
+///
+/// The design sets prices without a thousands separator — "$2400", not
+/// "$2,400" — and every amount goes through here so they cannot disagree.
+///
+/// This exists because they did. `Text("$\(amount)")` takes the
+/// `LocalizedStringKey` overload, which groups the digits, while
+/// `Text(someString)` does not — so the same number rendered "$1,800" on one
+/// screen and "$1800" on another, from what looks like identical code.
+enum Money {
+    static func label(_ amount: Int) -> String { "$\(amount)" }
 }
 
 /// Formatters are built once. Creating a `DateFormatter` costs roughly as much
@@ -70,6 +83,10 @@ enum TripFormat {
     static let monthYear: DateFormatter = fixed("MMM yyyy")
     /// The header's "Fri Sep 18, 2026".
     static let header: DateFormatter = fixed("EEE MMM d, yyyy")
+    /// Flight departure and arrival.
+    static let time: DateFormatter = fixed("HH:mm")
+    /// Itinerary day rows — "Sat 3 Oct".
+    static let dayLine: DateFormatter = fixed("EEE d MMM")
 
     private static func fixed(_ format: String) -> DateFormatter {
         let f = DateFormatter()
