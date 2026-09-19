@@ -30,6 +30,14 @@ struct ProfileView: View {
 
                     stats
 
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Theme")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(Color.ink)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        AppearancePicker(model: model)
+                    }
+
                     Text("There is no account service behind this screen yet — no "
                          + "backend, no session, nothing stored but whether you have "
                          + "seen the onboarding. It is listed honestly in the project "

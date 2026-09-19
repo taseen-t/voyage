@@ -5,6 +5,48 @@ enum Step: String {
     case splash, onboarding, auth, home
 }
 
+/// Which theme the app draws in.
+///
+/// `system` is the default and the honest one — it follows the device, which
+/// is what a person has already told iOS they want. The two overrides exist
+/// because both themes were designed, and someone should be able to see the
+/// other one without changing a system setting to do it.
+enum Appearance: String, CaseIterable, Identifiable {
+    case system, light, dark
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .system: "System"
+        case .light: "Light"
+        case .dark: "Dark"
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .system: "circle.lefthalf.filled"
+        case .light: "sun.max.fill"
+        case .dark: "moon.fill"
+        }
+    }
+
+    /// `nil` hands the decision back to the system.
+    var colorScheme: ColorScheme? {
+        switch self {
+        case .system: nil
+        case .light: .light
+        case .dark: .dark
+        }
+    }
+
+    var next: Appearance {
+        let all = Appearance.allCases
+        return all[(all.firstIndex(of: self)! + 1) % all.count]
+    }
+}
+
 @Observable
 final class AppModel {
     var step: Step = .splash
@@ -13,6 +55,15 @@ final class AppModel {
     var email = ""
     var tab: HomeTab = .upcoming
     var trips: [Trip] = Trip.sample
+
+    /// Persisted, unlike almost everything else here: a theme someone chose
+    /// and then had to choose again on every launch is worse than not offering
+    /// the choice.
+    var appearance: Appearance = Appearance(
+        rawValue: UserDefaults.standard.string(forKey: Key.appearance) ?? ""
+    ) ?? .system {
+        didSet { UserDefaults.standard.set(appearance.rawValue, forKey: Key.appearance) }
+    }
 
     /// Set once the user reaches home, so a returning user sees the splash and
     /// then their trips rather than the pitch again.
@@ -64,6 +115,7 @@ final class AppModel {
     /// Back to a first launch. The only thing that survives a relaunch is the
     /// onboarding flag, so this is the whole of it.
     func reset() {
+        // Appearance is deliberately kept: it is a preference, not session state.
         UserDefaults.standard.removeObject(forKey: Key.onboarded)
         hasOnboarded = false
         trips = Trip.sample
@@ -85,7 +137,10 @@ final class AppModel {
             .sorted { tab == .upcoming ? $0.start < $1.start : $0.start > $1.start }
     }
 
-    private enum Key { static let onboarded = "sonder.hasOnboarded" }
+    private enum Key {
+        static let onboarded = "sonder.hasOnboarded"
+        static let appearance = "sonder.appearance"
+    }
 
     #if DEBUG
     /// Jump straight to a screen: `-sonderStep auth`, or
@@ -98,6 +153,11 @@ final class AppModel {
            let step = Step(rawValue: launchArguments[i + 1]) {
             self.step = step
             if step != .splash && step != .onboarding { markOnboarded() }
+        }
+        if let i = launchArguments.firstIndex(of: "-sonderTheme"),
+           i + 1 < launchArguments.count,
+           let a = Appearance(rawValue: launchArguments[i + 1]) {
+            appearance = a
         }
         if launchArguments.contains("-sonderTab"),
            let i = launchArguments.firstIndex(of: "-sonderTab"),

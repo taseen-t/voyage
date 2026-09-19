@@ -31,9 +31,10 @@ struct OnboardingView: View {
     @Bindable var model: AppModel
     var onFinish: () -> Void
 
-    /// Drives the card deal on page 1. Set once the view is on screen, and
-    /// cleared when the page is left, so returning to it deals again.
-    @State private var dealt = false
+    /// Which page is currently playing its entrance. Held as the page number
+    /// rather than a boolean so every page replays when it is reached again,
+    /// forwards or back — not only the first one.
+    @State private var playing: Int?
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -86,11 +87,8 @@ struct OnboardingView: View {
 
             header
         }
-        .onAppear { deal(true) }
-        .onChange(of: model.onboardingPage) { _, page in
-            // Page one deals every time it is reached, forwards or back.
-            deal(page == 0)
-        }
+        .onAppear { play(model.onboardingPage) }
+        .onChange(of: model.onboardingPage) { _, page in play(page) }
     }
 
     private var current: OnboardingPage { OnboardingPage.all[model.onboardingPage] }
@@ -114,6 +112,8 @@ struct OnboardingView: View {
             }
 
             Spacer()
+
+            AppearanceButton(model: model)
 
             if model.onboardingPage < OnboardingPage.all.count - 1 {
                 Button("Skip") {
@@ -147,19 +147,19 @@ struct OnboardingView: View {
 
     @ViewBuilder
     private func illustration(for page: Int) -> some View {
+        let active = playing == page
         switch page {
-        case 0: StackedCardsIllustration(deal: dealt)
-        case 1: RouteMapIllustration()
-        default: ScatterIllustration()
+        case 0: StackedCardsIllustration(deal: active)
+        case 1: RouteMapIllustration(draw: active)
+        default: ScatterIllustration(settle: active)
         }
     }
 
-    /// Resetting to `false` first is what makes the deal replay: a spring
-    /// animating to the value it already holds does nothing at all.
-    private func deal(_ on: Bool) {
-        guard on else { dealt = false; return }
-        dealt = false
-        DispatchQueue.main.async { dealt = true }
+    /// Clearing first is what makes an entrance replay: an animation running
+    /// to the value it already holds does nothing at all.
+    private func play(_ page: Int) {
+        playing = nil
+        DispatchQueue.main.async { playing = page }
     }
 
     private func advance() {

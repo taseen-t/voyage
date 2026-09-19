@@ -29,6 +29,8 @@ struct RootView: View {
             }
         }
         .animation(.easeInOut(duration: 0.34), value: model.step)
+        .preferredColorScheme(model.appearance.colorScheme)
+        .animation(.easeInOut(duration: 0.25), value: model.appearance)
     }
 
     /// The next screen scales up to meet the viewer while the last one fades

@@ -82,5 +82,47 @@
     "license": "cc0 1.0",
     "source": "rawpixel",
     "landing": "https://www.rawpixel.com/image/5942566/free-public-domain-cc0-photo"
+  },
+  "stayHotel": {
+    "title": "Hotel Room",
+    "creator": "Travel Adventures",
+    "license": "cc0",
+    "source": "stocksnap",
+    "landing": "https://stocksnap.io/photo/hotel-room-DGBAEIS339"
+  },
+  "stayApartment": {
+    "title": "Couch Furniture",
+    "creator": "Kristin Hardwick",
+    "license": "cc0",
+    "source": "stocksnap",
+    "landing": "https://stocksnap.io/photo/couch-furniture-TQNWBTLHLY"
+  },
+  "stayRyokan": {
+    "title": "Japanese tatami room, background photo",
+    "creator": null,
+    "license": "cc0",
+    "source": "rawpixel",
+    "landing": "https://www.rawpixel.com/image/6035792/photo-image-background-public-domain-house"
+  },
+  "stayCabin": {
+    "title": null,
+    "creator": null,
+    "license": "cc0",
+    "source": "rawpixel",
+    "landing": "https://www.rawpixel.com/image/5949314/free-public-domain-cc0-photo"
+  },
+  "stayVilla": {
+    "title": "Infinity pool Haiku, Hawaii, United",
+    "creator": null,
+    "license": "cc0",
+    "source": "rawpixel",
+    "landing": "https://www.rawpixel.com/image/3285748/free-photo-image-vacation-summer-pool"
+  },
+  "stayHostel": {
+    "title": null,
+    "creator": null,
+    "license": "cc0",
+    "source": "rawpixel",
+    "landing": "https://www.rawpixel.com/image/6068670/free-public-domain-cc0-photo"
   }
 }

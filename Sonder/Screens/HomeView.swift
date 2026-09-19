@@ -3,9 +3,12 @@ import SwiftUI
 struct HomeView: View {
     @Bindable var model: AppModel
 
-    /// Drives the list's entrance. Reset on tab change so switching tabs deals
-    /// the new cards in rather than swapping them silently.
+    /// Drives the list's entrance, once. It is deliberately **not** reset when
+    /// the tab changes: replaying the staggered deal on every press read as
+    /// the screen reloading itself. Switching tabs now animates the rows that
+    /// actually differ, which is a change rather than a refresh.
     @State private var shown = false
+    @Namespace private var tabPill
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -29,6 +32,7 @@ struct HomeView: View {
                         .offset(y: shown ? 0 : 26)
                         .animation(.spring(response: 0.5, dampingFraction: 0.85)
                             .delay(Double(min(i, 6)) * 0.06), value: shown)
+                        .transition(.opacity.combined(with: .scale(scale: 0.97)))
                     }
                     if trips.isEmpty { emptyState }
                 }
@@ -42,10 +46,6 @@ struct HomeView: View {
             addButton
         }
         .onAppear { shown = true }
-        .onChange(of: model.tab) { _, _ in
-            shown = false
-            DispatchQueue.main.async { shown = true }
-        }
         .sheet(item: $model.route) { route in
             switch route {
             case .detail(let trip):
@@ -81,19 +81,7 @@ struct HomeView: View {
     private var header: some View {
         VStack(alignment: .leading, spacing: 2) {
             HStack(alignment: .center, spacing: 14) {
-                ForEach(HomeTab.allCases) { tab in
-                    Button {
-                        guard model.tab != tab else { return }
-                        Haptics.step()
-                        withAnimation(.easeInOut(duration: 0.22)) { model.tab = tab }
-                    } label: {
-                        Text(tab.rawValue)
-                            .font(.tab)
-                            .foregroundStyle(model.tab == tab ? Color.ink : Color.inkFaint)
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityAddTraits(model.tab == tab ? [.isSelected] : [])
-                }
+                segmentedTabs
 
                 Spacer(minLength: 8)
 
@@ -118,21 +106,71 @@ struct HomeView: View {
         .background(Color.surface)
     }
 
+    /// Upcoming and Past, as a control rather than two words. The selected
+    /// pill is one view moved between the two with `matchedGeometryEffect`, so
+    /// it slides across instead of one fading out while another fades in.
+    private var segmentedTabs: some View {
+        HStack(spacing: 4) {
+            ForEach(HomeTab.allCases) { tab in
+                let selected = model.tab == tab
+                Button {
+                    guard !selected else { return }
+                    Haptics.step()
+                    withAnimation(.spring(response: 0.38, dampingFraction: 0.82)) {
+                        model.tab = tab
+                    }
+                } label: {
+                    Text(tab.rawValue)
+                        .font(.system(size: 14.5, weight: .semibold))
+                        .foregroundStyle(selected ? Color.controlLabel : Color.inkMuted)
+                        .padding(.horizontal, 17)
+                        .frame(height: 34)
+                        .background {
+                            if selected {
+                                Capsule()
+                                    .fill(Color.control)
+                                    .matchedGeometryEffect(id: "tabPill", in: tabPill)
+                            }
+                        }
+                        .contentShape(Capsule())
+                }
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(selected ? [.isSelected] : [])
+            }
+        }
+        .padding(3)
+        .background(Capsule().fill(Color.fieldFill))
+    }
+
     /// Blur rising from the bottom edge, so the add button always has the
     /// same backdrop no matter which photograph has scrolled under it.
+    ///
+    /// The band is pinned to the **physical** bottom, not the safe area's.
+    /// A fixed-height view aligned to the bottom of a safe-area-respecting
+    /// stack stops short of the home indicator, which left the last card
+    /// rendering sharp underneath it — the blur then read as a grey rectangle
+    /// laid over the photograph rather than as the screen edge softening.
     private var bottomFade: some View {
         Rectangle()
-            .fill(.ultraThinMaterial)
+            // Thicker than the glass used on the cards: this one has to make
+            // whatever scrolls under it read as texture rather than as a
+            // headline competing with the button on top of it.
+            .fill(.regularMaterial)
             .mask(
+                // A long, soft ramp. The earlier one reached full strength by
+                // 45% of a short band, so its leading edge was a visible line.
                 LinearGradient(stops: [
-                    .init(color: .clear, location: 0.0),
-                    .init(color: .black.opacity(0.7), location: 0.45),
-                    .init(color: .black, location: 1.0),
+                    .init(color: .clear, location: 0.00),
+                    .init(color: .black.opacity(0.22), location: 0.26),
+                    .init(color: .black.opacity(0.72), location: 0.52),
+                    .init(color: .black, location: 0.74),
+                    .init(color: .black, location: 1.00),
                 ], startPoint: .top, endPoint: .bottom)
             )
-            .frame(height: 104)
+            .frame(height: 150)
+            .frame(maxHeight: .infinity, alignment: .bottom)
+            .ignoresSafeArea()
             .allowsHitTesting(false)
-            .ignoresSafeArea(edges: .bottom)
     }
 
     private var addButton: some View {

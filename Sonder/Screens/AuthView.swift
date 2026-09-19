@@ -11,6 +11,12 @@ struct AuthView: View {
             Color.surface.ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 0) {
+                HStack {
+                    Spacer()
+                    AppearanceButton(model: model)
+                }
+                .padding(.top, 4)
+
                 Spacer(minLength: 0)
 
                 Text("Your next trip starts here.")
