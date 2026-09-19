@@ -1,8 +1,8 @@
 # Sonder
 
 A native iOS trip planner, built in SwiftUI from a twelve-screen design and
-carried on into the screens that design implies — **eleven screens, each in
-light and dark**, with **no third-party dependencies at all**.
+carried on into the screens that design implies — **fifteen screens, each in
+light, dark and system**, with **no third-party dependencies at all**.
 
 ![Sonder, light and dark](Screenshots/contact-sheet.png)
 
@@ -38,10 +38,17 @@ in with the tile's own colour, and writes a 1024px icon and a 640px in-app
 asset. Both are full-bleed squares — iOS masks the icon itself, and an icon
 that rounds its own corners shows a hairline of background inside that mask.
 
-**The card deck deals in.** Five trip cards start further off the left edge
-than a card is wide, fly in on staggered springs, and land fanned over the mark
-with the front card nearest centre — so no card is ever caught half-entering at
-the screen edge, and the eye finishes where the copy begins.
+**Every onboarding page animates when it is reached.** Cards deal in from
+further off the left edge than a card is wide, so none is caught half-entering.
+The route on page two draws itself, and each pin lands as the line arrives —
+with the delays **computed from arc length** rather than hand-tuned, so they
+stay in step if a stop moves. Page three settles its tiles outward, one by one.
+
+**The illustration cards were rendering at 1.7× their frame.** `scaledToFill`
+reports a size *larger* than the one it was offered, so a `ZStack` containing
+it adopts that larger size and an outer `.frame()` then centres an oversized
+card instead of shrinking it. The photograph is a background now, which cannot
+affect layout at all.
 
 **Photography ships at the size it is displayed.** Twelve CC0 destinations, as
 1020×850 cards and 240×240 tiles — 1.7 MB in total, against roughly 90 MB of
@@ -58,9 +65,14 @@ originals. Nothing is resampled at runtime. Provenance for every image is in
 Twenty-two launches instead of a hundred-odd taps, and a tap landing a pixel
 off cannot silently photograph the wrong screen.
 
-**Flights and itineraries are generated from a seed derived from the trip**, so
-the same trip always offers the same options. A results list that reshuffles on
-every open makes "the one I saw a minute ago" impossible to find again.
+**Flights, stays and itineraries are generated from a seed derived from the
+trip**, so the same trip always offers the same options. A list that reshuffles
+on every open makes "the one I saw a minute ago" impossible to find again.
+
+**Money formats in one place.** `Text("$\(n)")` takes the `LocalizedStringKey`
+overload and groups the digits while `Text(someString)` does not — so the same
+number read "$1,800" on one screen and "$1800" on another, from what looks like
+identical code.
 
 ## Layout
 
@@ -79,8 +91,9 @@ Tools/        build, screenshots, icon rendering, vault link check
 
 Every control goes somewhere; none of them reaches a server, because there is
 no server. The auth screen validates an email's shape and continues, Google and
-Apple are not wired, flight results are generated rather than searched, and
-nothing but the onboarding flag survives a relaunch. Selecting a flight saves
+Apple are not wired, flights and stays are generated rather than searched, the
+itinerary cannot be edited, and nothing but the onboarding flag and the theme
+survives a relaunch. Selecting a flight saves
 it to the trip rather than buying it, and the screen says so — a checkout that
 appears to charge someone is worse than an honest dead end.
 
@@ -97,7 +110,14 @@ than learned three times:
   **Sonder motion** · **Sonder photography** · **Sonder screens** ·
   **Sonder open items**
 
-`Tools/check-vault-links.py` asserts every wikilink in that vault resolves.
+Sonder is deliberately **its own island** in that graph: nothing in its folder
+links out and nothing links in, so its cluster reads as a separate project
+rather than being pulled into another app's web through a shared hub.
+
+Two checks keep that true — `Tools/check-vault-links.py` asserts every wikilink
+in the vault resolves, and `Tools/check-vault-islands.py` asserts Sonder is
+still unattached. One stray pair of brackets silently joins two clusters, and
+only a graph view would otherwise show it.
 
 ## Licence
 
