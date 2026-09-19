@@ -99,6 +99,23 @@ final class AppModel {
             self.step = step
             if step != .splash && step != .onboarding { markOnboarded() }
         }
+        if launchArguments.contains("-sonderTab"),
+           let i = launchArguments.firstIndex(of: "-sonderTab"),
+           i + 1 < launchArguments.count,
+           launchArguments[i + 1] == "past" {
+            tab = .past
+        }
+        if let i = launchArguments.firstIndex(of: "-sonderRoute"),
+           i + 1 < launchArguments.count {
+            switch launchArguments[i + 1] {
+            case "detail":  route = trips.first.map(Route.detail)
+            case "flights": route = trips.first.map(Route.flights)
+            case "new":     route = .newTrip
+            case "profile": route = .profile
+            default: break
+            }
+            if route != nil { step = .home; markOnboarded() }
+        }
         if let i = launchArguments.firstIndex(of: "-sonderPage"),
            i + 1 < launchArguments.count,
            let page = Int(launchArguments[i + 1]), (0...2).contains(page) {

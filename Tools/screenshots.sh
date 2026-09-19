@@ -35,5 +35,10 @@ for theme in light dark; do
     shoot "$theme-4-onboarding3" 2.2 -sonderStep onboarding -sonderPage 2
     shoot "$theme-5-auth"        2.2 -sonderStep auth
     shoot "$theme-6-home"        2.2 -sonderStep home
+    shoot "$theme-7-past"        2.2 -sonderStep home -sonderTab past
+    shoot "$theme-8-detail"      2.4 -sonderRoute detail
+    shoot "$theme-9-flights"     2.4 -sonderRoute flights
+    shoot "$theme-10-newtrip"    2.4 -sonderRoute new
+    shoot "$theme-11-profile"    2.4 -sonderRoute profile
 done
 echo "wrote $(ls "$out" | wc -l | tr -d ' ') screenshots to Screenshots/"
