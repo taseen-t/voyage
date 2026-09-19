@@ -5,6 +5,7 @@ import SwiftUI
 /// than a screen that says so.
 struct ProfileView: View {
     @Bindable var model: AppModel
+    var onSaved: () -> Void
     var onClose: () -> Void
 
     var body: some View {
@@ -29,6 +30,31 @@ struct ProfileView: View {
                     }
 
                     stats
+
+                    Button(action: { Haptics.tap(); onSaved() }) {
+                        HStack(spacing: 12) {
+                            Image(systemName: "bookmark.fill")
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundStyle(Color.inkMuted)
+                                .frame(width: 34, height: 34)
+                                .background(Color.fieldFill, in: RoundedRectangle(
+                                    cornerRadius: 10, style: .continuous))
+                            Text("Saved trips")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundStyle(Color.ink)
+                            Spacer()
+                            Text("\(model.trips.filter(\.isSaved).count)")
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundStyle(Color.inkFaint)
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 11, weight: .semibold))
+                                .foregroundStyle(Color.inkFaint)
+                        }
+                        .padding(12)
+                        .background(Color.surfaceElevated,
+                                    in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    }
+                    .buttonStyle(.plain)
 
                     VStack(alignment: .leading, spacing: 10) {
                         Text("Theme")

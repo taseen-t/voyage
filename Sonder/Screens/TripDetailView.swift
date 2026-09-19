@@ -7,6 +7,10 @@ struct TripDetailView: View {
     var onBook: () -> Void
     var onSave: () -> Void
     var onClose: () -> Void
+    /// Handed a route rather than three closures: the detail screen is only
+    /// forwarding a choice, and it should not have to know what any of them
+    /// present.
+    var onSection: (AppModel.Route) -> Void
 
     @State private var appeared = false
 
@@ -20,6 +24,7 @@ struct TripDetailView: View {
                 VStack(spacing: 0) {
                     hero
                     facts
+                    sections
                     itinerary
                 }
                 .padding(.bottom, 110)
@@ -122,6 +127,41 @@ struct TripDetailView: View {
 
     private var divider: some View {
         Rectangle().fill(Color.hairline).frame(width: 1, height: 26)
+    }
+
+    // MARK: Sections
+
+    /// Stays, budget and documents. Three taps the trip already implies and
+    /// had nowhere to send anyone.
+    private var sections: some View {
+        HStack(spacing: 10) {
+            section("Stays", "bed.double") { onSection(.stays(trip)) }
+            section("Budget", "creditcard") { onSection(.budget(trip)) }
+            section("Documents", "doc.text") { onSection(.documents(trip)) }
+        }
+        .padding(.horizontal, Metrics.gutter)
+        .padding(.bottom, 22)
+        .opacity(appeared ? 1 : 0)
+        .offset(y: appeared ? 0 : 10)
+    }
+
+    private func section(_ title: String, _ symbol: String,
+                         action: @escaping () -> Void) -> some View {
+        Button(action: { Haptics.tap(); action() }) {
+            VStack(spacing: 7) {
+                Image(systemName: symbol)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(Color.ink)
+                Text(title)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(Color.inkMuted)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 15)
+            .background(Color.surfaceElevated,
+                        in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: Itinerary

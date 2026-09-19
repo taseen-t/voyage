@@ -53,10 +53,21 @@ struct HomeView: View {
                     trip: model.trips.first { $0.id == trip.id } ?? trip,
                     onBook: { model.route = .flights(trip) },
                     onSave: { Haptics.tap(); model.toggleSaved(trip) },
-                    onClose: { model.route = nil }
+                    onClose: { model.route = nil },
+                    onSection: { model.route = $0 }
                 )
             case .flights(let trip):
                 FlightResultsView(trip: trip, onClose: { model.route = nil })
+            case .stays(let trip):
+                StaysView(trip: trip, onClose: { model.route = nil })
+            case .budget(let trip):
+                BudgetView(trip: trip, onClose: { model.route = nil })
+            case .documents(let trip):
+                DocumentsView(trip: trip, onClose: { model.route = nil })
+            case .saved:
+                SavedView(model: model,
+                          onOpen: { model.route = .detail($0) },
+                          onClose: { model.route = nil })
             case .newTrip:
                 NewTripView(
                     onCreate: { trip in
@@ -66,7 +77,9 @@ struct HomeView: View {
                     onClose: { model.route = nil }
                 )
             case .profile:
-                ProfileView(model: model, onClose: { model.route = nil })
+                ProfileView(model: model,
+                            onSaved: { model.route = .saved },
+                            onClose: { model.route = nil })
             }
         }
     }

@@ -94,15 +94,23 @@ final class AppModel {
     enum Route: Identifiable, Hashable {
         case detail(Trip)
         case flights(Trip)
+        case stays(Trip)
+        case budget(Trip)
+        case documents(Trip)
         case newTrip
         case profile
+        case saved
 
         var id: String {
             switch self {
             case .detail(let t): "detail-\(t.id)"
             case .flights(let t): "flights-\(t.id)"
+            case .stays(let t): "stays-\(t.id)"
+            case .budget(let t): "budget-\(t.id)"
+            case .documents(let t): "docs-\(t.id)"
             case .newTrip: "new"
             case .profile: "profile"
+            case .saved: "saved"
             }
         }
     }
@@ -170,8 +178,12 @@ final class AppModel {
             switch launchArguments[i + 1] {
             case "detail":  route = trips.first.map(Route.detail)
             case "flights": route = trips.first.map(Route.flights)
+            case "stays":   route = trips.first.map(Route.stays)
+            case "budget":  route = trips.first.map(Route.budget)
+            case "docs":    route = trips.first.map(Route.documents)
             case "new":     route = .newTrip
             case "profile": route = .profile
+            case "saved":   route = .saved
             default: break
             }
             if route != nil { step = .home; markOnboarded() }
