@@ -5,10 +5,20 @@ struct StaysView: View {
     let trip: Trip
     var onClose: () -> Void
 
+    init(trip: Trip, onClose: @escaping () -> Void) {
+        self.trip = trip
+        self.onClose = onClose
+        _stays = State(initialValue: Stay.options(for: trip))
+    }
+
     @State private var selected: Stay.ID?
+    /// Generated once, in `init`. Regenerating from a computed property means
+    /// a fresh list on every body pass, which is wasted work even once the ids
+    /// are stable.
+    @State private var stays: [Stay]
     @State private var appeared = false
 
-    private var stays: [Stay] { Stay.options(for: trip) }
+
     private var nights: Int {
         Calendar.current.dateComponents([.day], from: trip.start, to: trip.end).day ?? 1
     }

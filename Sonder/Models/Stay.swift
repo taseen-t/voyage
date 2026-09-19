@@ -32,7 +32,6 @@ struct Stay: Identifiable, Hashable {
         }
     }
 
-    let id = UUID()
     let name: String
     let kind: Kind
     let area: String
@@ -40,6 +39,9 @@ struct Stay: Identifiable, Hashable {
     let reviews: Int
     let perNight: Int
     let perks: [String]
+
+    /// Derived, not minted — see the note on `Flight.id`.
+    var id: String { "\(kind.rawValue)-\(name)-\(area)" }
 
     var ratingLabel: String { String(format: "%.1f", rating) }
 }
@@ -62,10 +64,15 @@ extension Stay {
                         ["Onsen", "Breakfast"], ["Fireplace", "Parking"],
                         ["Pool", "Sea view"], ["Shared kitchen", "Lockers"]]
 
+        // One offset, drawn once, then walked. Drawing a fresh index per row
+        // let the same name come up twice — two "Hold Fast House" in one list
+        // reads as a bug even though their ids differ.
+        let firstName = next(names.count)
+
         return kinds.enumerated().map { i, kind in
             let base = [190, 120, 240, 150, 310, 42][Kind.allCases.firstIndex(of: kind) ?? 0]
             return Stay(
-                name: names[(next(names.count) + i) % names.count],
+                name: names[(firstName + i) % names.count],
                 kind: kind,
                 area: areas[i % areas.count],
                 rating: 8.2 + Double(next(16)) / 10,

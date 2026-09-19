@@ -1,7 +1,6 @@
 import Foundation
 
 struct Flight: Identifiable, Hashable {
-    let id: UUID
     let airline: String
     let number: String
     let origin: String
@@ -10,6 +9,15 @@ struct Flight: Identifiable, Hashable {
     let arrives: Date
     let stops: Int
     let price: Int
+
+    /// Derived from the flight itself rather than stored as a `UUID`.
+    ///
+    /// A generated list is rebuilt every time the view's body runs, so a minted
+    /// id is a *different* id on every render — which made selection look
+    /// broken (the row never highlighted, while the button below it enabled
+    /// because something was nominally selected) and made `ForEach` treat
+    /// every row as new, rebuilding rather than animating.
+    var id: String { "\(number)@\(Int(departs.timeIntervalSince1970))" }
 
     var duration: String {
         let minutes = Int(arrives.timeIntervalSince(departs) / 60)
@@ -57,9 +65,11 @@ extension Flight {
             let stops = i == 0 ? 0 : next(3) == 0 ? 0 : (next(4) == 0 ? 2 : 1)
             let hours = 7 + stops * 3 + next(4)
             return Flight(
-                id: UUID(),
                 airline: carrier.0,
-                number: "\(carrier.1) \(100 + next(880))",
+                // Banded by index so two options can never carry the same
+                // number: the same route twice in a day under one number reads
+                // as a bug, and `id` is built from the number and the time.
+                number: "\(carrier.1) \(120 + i * 90 + next(80))",
                 origin: origin,
                 destination: trip.destination.airport,
                 departs: departs,

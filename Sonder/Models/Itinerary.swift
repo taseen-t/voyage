@@ -14,10 +14,12 @@ struct ItineraryItem: Identifiable, Hashable {
         }
     }
 
-    let id = UUID()
     let time: String
     let title: String
     let kind: Kind
+
+    /// Derived, not minted — see the note on `Flight.id`.
+    var id: String { "\(time)-\(kind.rawValue)-\(title)" }
 }
 
 struct ItineraryDay: Identifiable, Hashable {

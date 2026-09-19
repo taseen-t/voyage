@@ -5,7 +5,6 @@ import SwiftUI
 /// Where the money goes. Split from the trip's own budget rather than stored,
 /// so the two can never disagree about the total.
 struct BudgetLine: Identifiable, Hashable {
-    let id = UUID()
     let name: String
     let symbol: String
     /// Fraction of the whole.
@@ -13,6 +12,10 @@ struct BudgetLine: Identifiable, Hashable {
     let amount: Int
     /// How much of this line is already committed.
     let spent: Int
+
+    /// Derived, not minted — see the note on `Flight.id`. Line names are
+    /// unique within a breakdown.
+    var id: String { name }
 
     var spentShare: Double { amount == 0 ? 0 : Double(spent) / Double(amount) }
 }
@@ -61,11 +64,13 @@ struct TravelDocument: Identifiable, Hashable {
         }
     }
 
-    let id = UUID()
     let name: String
     let detail: String
     let symbol: String
     let state: State
+
+    /// Derived, not minted — see the note on `Flight.id`.
+    var id: String { name }
 }
 
 extension TravelDocument {

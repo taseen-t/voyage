@@ -9,10 +9,20 @@ struct FlightResultsView: View {
     let trip: Trip
     var onClose: () -> Void
 
+    init(trip: Trip, onClose: @escaping () -> Void) {
+        self.trip = trip
+        self.onClose = onClose
+        _flights = State(initialValue: Flight.options(for: trip))
+    }
+
     @State private var selected: Flight.ID?
+    /// Generated once, in `init`. Regenerating from a computed property means
+    /// a fresh list on every body pass, which is wasted work even once the ids
+    /// are stable.
+    @State private var flights: [Flight]
     @State private var appeared = false
 
-    private var flights: [Flight] { Flight.options(for: trip) }
+
 
     var body: some View {
         ZStack(alignment: .top) {
