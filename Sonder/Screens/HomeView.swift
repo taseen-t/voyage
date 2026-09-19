@@ -16,7 +16,8 @@ struct HomeView: View {
                     ForEach(trips) { trip in
                         TripCard(trip: trip,
                                  onSave: { Haptics.tap(); model.toggleSaved(trip) },
-                                 onOpen: { Haptics.tap() })
+                                 onOpen: { Haptics.tap() },
+                                 onBook: { Haptics.tap() })
                     }
                     if trips.isEmpty { emptyState }
                 }

@@ -6,6 +6,7 @@ struct TripCard: View {
     let trip: Trip
     var onSave: () -> Void
     var onOpen: () -> Void
+    var onBook: () -> Void
 
     var body: some View {
         ZStack {
@@ -96,13 +97,19 @@ struct TripCard: View {
 
     private var actionBar: some View {
         HStack(spacing: 0) {
-            Label {
-                Text("Book a Flight").font(.system(size: 13.5, weight: .semibold))
-            } icon: {
-                Image(systemName: "airplane.departure").font(.system(size: 12, weight: .semibold))
+            Button(action: onBook) {
+                Label {
+                    Text("Book a Flight").font(.system(size: 13.5, weight: .semibold))
+                } icon: {
+                    Image(systemName: "airplane.departure")
+                        .font(.system(size: 12, weight: .semibold))
+                }
+                .foregroundStyle(.white)
+                .padding(.leading, 16)
+                .padding(.vertical, 12)
+                .contentShape(Rectangle())
             }
-            .foregroundStyle(.white)
-            .padding(.leading, 16)
+            .buttonStyle(.plain)
 
             Spacer(minLength: 12)
 

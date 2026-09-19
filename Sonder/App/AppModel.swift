@@ -47,6 +47,26 @@ final class AppModel {
     }
 
     private enum Key { static let onboarded = "sonder.hasOnboarded" }
+
+    #if DEBUG
+    /// Jump straight to a screen: `-sonderStep auth`, or
+    /// `-sonderStep onboarding -sonderPage 2`. Screenshotting six screens in
+    /// two themes is twelve launches; without this it is also sixty taps, and
+    /// a tap that lands a pixel off silently captures the wrong screen.
+    init(launchArguments: [String] = CommandLine.arguments) {
+        if let i = launchArguments.firstIndex(of: "-sonderStep"),
+           i + 1 < launchArguments.count,
+           let step = Step(rawValue: launchArguments[i + 1]) {
+            self.step = step
+            if step != .splash && step != .onboarding { markOnboarded() }
+        }
+        if let i = launchArguments.firstIndex(of: "-sonderPage"),
+           i + 1 < launchArguments.count,
+           let page = Int(launchArguments[i + 1]), (0...2).contains(page) {
+            onboardingPage = page
+        }
+    }
+    #endif
 }
 
 enum HomeTab: String, CaseIterable, Identifiable {

@@ -203,7 +203,7 @@ struct ScatterIllustration: View {
         .init(destination: .santorini,  angle:  58, radius: 0.455, scale: 0.140, tilt: -6),
         .init(destination: .kyoto,      angle: 222, radius: 0.455, scale: 0.130, tilt:  9),
         .init(destination: .lisbon,     angle: 316, radius: 0.455, scale: 0.135, tilt: -5),
-        .init(destination: .marrakesh,  angle:   4, radius: 0.450, scale: 0.125, tilt:  8),
+        .init(destination: .marrakesh,  angle:   4, radius: 0.395, scale: 0.125, tilt:  8),
     ]
 
     var body: some View {
