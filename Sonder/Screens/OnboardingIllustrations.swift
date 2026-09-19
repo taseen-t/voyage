@@ -12,22 +12,25 @@ struct StackedCardsIllustration: View {
 
             ZStack {
                 AppMark(side: w * 0.50)
-                    .offset(x: w * 0.03, y: -w * 0.17)
+                    .offset(x: w * 0.09, y: -w * 0.17)
 
-                MiniTripCard(destination: .santorini, badge: nil, tint: nil)
+                MiniTripCard(destination: .santorini, badge: nil,
+                             tint: nil, dates: "Aug 2 – 9, 2026")
                     .frame(width: card.width, height: card.height)
                     .rotationEffect(.degrees(-14))
-                    .offset(x: -w * 0.38, y: w * 0.16)
+                    .offset(x: -w * 0.32, y: w * 0.16)
 
-                MiniTripCard(destination: .kyoto, badge: "Today", tint: .green)
+                MiniTripCard(destination: .kyoto, badge: "Today",
+                             tint: Color(rgb: 0x2E9E5B), dates: "Oct 3 – 10, 2026")
                     .frame(width: card.width, height: card.height)
                     .rotationEffect(.degrees(-8))
-                    .offset(x: -w * 0.20, y: w * 0.13)
+                    .offset(x: -w * 0.14, y: w * 0.13)
 
-                MiniTripCard(destination: .lisbon, badge: "In 32 days", tint: nil)
+                MiniTripCard(destination: .lisbon, badge: "In 32 days",
+                             tint: nil, dates: "Nov 12 – 19, 2026")
                     .frame(width: card.width, height: card.height)
                     .rotationEffect(.degrees(-2))
-                    .offset(x: w * 0.06, y: w * 0.10)
+                    .offset(x: w * 0.12, y: w * 0.10)
             }
             .frame(width: w, height: geo.size.height, alignment: .center)
         }
@@ -41,6 +44,7 @@ private struct MiniTripCard: View {
     let destination: Destination
     let badge: String?
     let tint: Color?
+    let dates: String
 
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -65,7 +69,7 @@ private struct MiniTripCard: View {
                     .foregroundStyle(.white)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
-                Text("Nov 12 – 19, 2026")
+                Text(dates)
                     .font(.system(size: 7.5, weight: .medium))
                     .foregroundStyle(.white.opacity(0.75))
             }
