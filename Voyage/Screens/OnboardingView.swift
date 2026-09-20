@@ -53,6 +53,16 @@ struct OnboardingView: View {
                     }
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
+                // The illustrations run to the very top of the display, behind
+                // the status bar and the Dynamic Island. It has to come off the
+                // TabView rather than the map inside it: each page is
+                // `.clipped()` so the copy below stays clean, and clipping
+                // applies to the whole subtree — a child ignoring the inset on
+                // its own would still be cut at the page's edge.
+                //
+                // The header sits outside this, so back, skip and the theme
+                // button keep their safe-area headroom.
+                .ignoresSafeArea(edges: .top)
 
                 VStack(spacing: 12) {
                     Text(current.title)
