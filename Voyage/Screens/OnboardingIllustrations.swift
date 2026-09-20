@@ -389,30 +389,42 @@ struct ScatterIllustration: View {
     /// reached rather than only on the first visit.
     var settle: Bool
 
+    /// Ring radii as fractions of the frame's width. **One array drives both
+    /// the drawn rings and the tile positions**, so a tile provably sits on a
+    /// ring rather than near where one happens to have been drawn.
+    private let rings: [CGFloat] = [0.20, 0.315, 0.44, 0.57]
+
     private struct Tile {
         let destination: Destination
-        /// Clock angle in degrees, distance and size as fractions of the
-        /// frame's width, and a small rotation.
-        let angle: Double, radius: CGFloat, scale: CGFloat, tilt: Double
+        /// Clock angle in degrees.
+        let angle: Double
+        /// Which ring it belongs to.
+        let ring: Int
+        /// How far off that ring it sits, as a fraction of the frame. This is
+        /// the deliberate part: the tiles follow the rings, and each one is
+        /// nudged just far enough off to say it was placed rather than
+        /// computed.
+        let drift: CGFloat
+        let scale: CGFloat
+        let tilt: Double
     }
 
-    /// Sizes vary deliberately — an evenly sized ring reads as a menu.
+    /// Eight on the middle ring at 45° apart, four on the outer ring sitting
+    /// in their gaps. Even angles, uneven everything else.
     private let tiles: [Tile] = [
-        // Inner ring, eight stops of 45°, with the size varied so it reads as
-        // a scatter rather than a menu.
-        .init(destination: .banff,      angle:  -78, radius: 0.315, scale: 0.185, tilt:  -6),
-        .init(destination: .iceland,    angle:  -33, radius: 0.300, scale: 0.150, tilt:   9),
-        .init(destination: .queenstown, angle:   12, radius: 0.320, scale: 0.170, tilt:  -9),
-        .init(destination: .dolomites,  angle:   57, radius: 0.305, scale: 0.155, tilt:   6),
-        .init(destination: .fuji,       angle:  102, radius: 0.315, scale: 0.175, tilt: -11),
-        .init(destination: .hallstatt,  angle:  147, radius: 0.300, scale: 0.140, tilt:   8),
-        .init(destination: .norway,     angle:  192, radius: 0.320, scale: 0.165, tilt:  -5),
-        .init(destination: .cappadocia, angle:  237, radius: 0.305, scale: 0.150, tilt:  11),
-        // Outer ring, offset so it sits in the gaps.
-        .init(destination: .lisbon,     angle:  -12, radius: 0.455, scale: 0.150, tilt:  -7),
-        .init(destination: .santorini,  angle:   78, radius: 0.445, scale: 0.135, tilt:  10),
-        .init(destination: .kyoto,      angle:  168, radius: 0.455, scale: 0.145, tilt:  -8),
-        .init(destination: .marrakesh,  angle:  258, radius: 0.445, scale: 0.130, tilt:   7),
+        .init(destination: .banff,      angle:  -78, ring: 1, drift:  0.028, scale: 0.185, tilt:  -6),
+        .init(destination: .iceland,    angle:  -33, ring: 1, drift: -0.022, scale: 0.150, tilt:   9),
+        .init(destination: .queenstown, angle:   12, ring: 1, drift:  0.034, scale: 0.170, tilt:  -9),
+        .init(destination: .dolomites,  angle:   57, ring: 1, drift: -0.030, scale: 0.155, tilt:   6),
+        .init(destination: .fuji,       angle:  102, ring: 1, drift:  0.024, scale: 0.175, tilt: -11),
+        .init(destination: .hallstatt,  angle:  147, ring: 1, drift: -0.018, scale: 0.140, tilt:   8),
+        .init(destination: .norway,     angle:  192, ring: 1, drift:  0.031, scale: 0.165, tilt:  -5),
+        .init(destination: .cappadocia, angle:  237, ring: 1, drift: -0.026, scale: 0.150, tilt:  11),
+
+        .init(destination: .lisbon,     angle:  -12, ring: 2, drift: -0.030, scale: 0.150, tilt:  -7),
+        .init(destination: .santorini,  angle:   78, ring: 2, drift:  0.026, scale: 0.135, tilt:  10),
+        .init(destination: .kyoto,      angle:  168, ring: 2, drift: -0.034, scale: 0.145, tilt:  -8),
+        .init(destination: .marrakesh,  angle:  258, ring: 2, drift:  0.022, scale: 0.130, tilt:   7),
     ]
 
     var body: some View {
@@ -431,6 +443,7 @@ struct ScatterIllustration: View {
 
                 ForEach(Array(tiles.enumerated()), id: \.offset) { i, t in
                     let a = t.angle * .pi / 180
+                    let r = rings[t.ring] + t.drift
                     Image(t.destination.tile)
                         .resizable()
                         .scaledToFill()
@@ -447,8 +460,8 @@ struct ScatterIllustration: View {
                                 .delay(0.14 + Double(i) * 0.045),
                             value: settle
                         )
-                        .position(x: centre.x + cos(a) * w * t.radius,
-                                  y: centre.y + sin(a) * w * t.radius)
+                        .position(x: centre.x + cos(a) * w * r,
+                                  y: centre.y + sin(a) * w * r)
                 }
             }
         }
@@ -458,7 +471,7 @@ struct ScatterIllustration: View {
     /// rather than drawn faint, so they bleed into the page instead of ending
     /// on a hard edge.
     private func rings(w: CGFloat, centre: CGPoint) -> some View {
-        ForEach(Array([0.20, 0.31, 0.43, 0.56].enumerated()), id: \.offset) { i, r in
+        ForEach(Array(rings.enumerated()), id: \.offset) { i, r in
             Circle()
                 .stroke(Color.inkFaint.opacity(0.55 - Double(i) * 0.09),
                         lineWidth: w * (0.020 + CGFloat(i) * 0.010))
