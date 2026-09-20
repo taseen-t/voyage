@@ -50,7 +50,7 @@ extension Stay {
     /// Five options for a trip, seeded from the trip itself so the list is the
     /// same every time it is opened. See `Flight.options` — same reasoning.
     static func options(for trip: Trip) -> [Stay] {
-        var seed = UInt64(truncatingIfNeeded: trip.destination.rawValue.hashValue) &+ 99
+        var seed = Seed.value(for: trip, salt: 99)
         func next(_ bound: Int) -> Int {
             seed = seed &* 6364136223846793005 &+ 1442695040888963407
             return Int((seed >> 33) % UInt64(max(bound, 1)))

@@ -36,7 +36,7 @@ extension ItineraryDay {
     static func plan(for trip: Trip) -> [ItineraryDay] {
         let calendar = Calendar.current
         let days = max(calendar.dateComponents([.day], from: trip.start, to: trip.end).day ?? 1, 1)
-        var seed = UInt64(truncatingIfNeeded: trip.destination.rawValue.hashValue)
+        var seed = Seed.value(for: trip, salt: 7)
         func next(_ bound: Int) -> Int {
             seed = seed &* 6364136223846793005 &+ 1442695040888963407
             return Int((seed >> 33) % UInt64(max(bound, 1)))

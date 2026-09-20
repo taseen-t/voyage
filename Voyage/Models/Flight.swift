@@ -43,8 +43,7 @@ extension Flight {
     /// a results list that reshuffles every time it is opened reads as a bug,
     /// and makes "the one I saw a minute ago" impossible to find again.
     static func options(for trip: Trip, from origin: String = "LHR") -> [Flight] {
-        var seed = UInt64(truncatingIfNeeded: trip.destination.rawValue.hashValue)
-            ^ UInt64(trip.start.timeIntervalSince1970)
+        var seed = Seed.value(for: trip)
         func next(_ bound: Int) -> Int {
             seed = seed &* 6364136223846793005 &+ 1442695040888963407
             return Int((seed >> 33) % UInt64(max(bound, 1)))
