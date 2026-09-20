@@ -117,9 +117,9 @@ final class AppModel {
         }
     }
 
-    /// Set briefly after a trip is created, so the list can scroll to it and
-    /// flash it. Answers "where did it go" — the list is date-sorted, so a new
-    /// trip rarely lands where you are looking.
+    /// Set after a trip is created, so the list can scroll to it. Answers
+    /// "where did it go" — the list is date-sorted, so a new trip rarely lands
+    /// where you were looking.
     var highlight: Trip.ID?
 
     func add(_ trip: Trip) {

@@ -29,12 +29,6 @@ struct HomeView: View {
                             onBook: { open(.flights(trip)) }
                         )
                         .id(trip.id)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: Metrics.cardRadius,
-                                             style: .continuous)
-                                .stroke(Color.accent, lineWidth: 3)
-                                .opacity(model.highlight == trip.id ? 1 : 0)
-                        )
                         .onTapGesture { open(.detail(trip)) }
                         .opacity(shown ? 1 : 0)
                         .offset(y: shown ? 0 : 26)
@@ -53,10 +47,6 @@ struct HomeView: View {
                 guard let id else { return }
                 withAnimation(.easeInOut(duration: 0.45)) {
                     proxy.scrollTo(id, anchor: .center)
-                }
-                Task {
-                    try? await Task.sleep(for: .milliseconds(1400))
-                    withAnimation(.easeOut(duration: 0.4)) { model.highlight = nil }
                 }
             }
             }
