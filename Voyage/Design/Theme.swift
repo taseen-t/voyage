@@ -84,9 +84,6 @@ enum Metrics {
     static let buttonRadius: CGFloat = 15
     static let fieldRadius: CGFloat = 13
     static let cardRadius: CGFloat = 26
-    /// Photo tiles in the onboarding illustrations.
-    static let tileRadius: CGFloat = 13
-    static let iconTile: CGFloat = 78
     /// Headroom at the top of a sheet.
     ///
     /// A sheet gets no status-bar safe area — its content begins at the sheet's

@@ -8,8 +8,6 @@ extension Font {
     static let display = Font.system(size: 30, weight: .bold)
     /// Card titles on the home list — "Kyoto, Japan".
     static let cardTitle = Font.system(size: 25, weight: .bold)
-    /// Segmented control, section headers.
-    static let tab = Font.system(size: 19, weight: .semibold)
     /// Price.
     static let price = Font.system(size: 21, weight: .bold)
     /// Supporting paragraph under a headline.
