@@ -101,10 +101,11 @@ struct HomeView: View {
                 case .documents(let trip):
                     DocumentsView(trip: trip, onClose: { model.route = .detail(trip) })
                 case .created(let trip):
-                    TripCreatedView(
+                    TripConfirmView(
                         trip: model.trips.first { $0.id == trip.id } ?? trip,
-                        onOpen: { model.route = .detail(trip) },
-                        onDone: { model.route = nil; model.highlight = trip.id }
+                        reason: .created,
+                        onContinue: { model.route = .detail(trip) },
+                        onHome: { model.route = nil; model.highlight = trip.id }
                     )
                 case .confirm(let trip):
                     // Re-read the trip: the payload was captured before the
