@@ -96,31 +96,52 @@ struct AuthView: View {
 
 /// Google's mark is the one glyph SF Symbols has no stand-in for. Drawn rather
 /// than bundled, so no third-party artwork ships in the binary.
+/// Google's mark is the one glyph SF Symbols has no stand-in for, so it is
+/// drawn rather than bundled — no third-party artwork ships in the binary.
+///
+/// > Note: Google's brand guidelines ask for their official asset, unmodified.
+/// > A redrawn approximation is fine for a portfolio build with no real Google
+/// > sign-in behind it, and would need replacing before shipping. See
+/// > `Voyage open items`.
 private struct GoogleGlyph: View {
+    // Degrees, clockwise from three o'clock, in SwiftUI's y-down space.
+    // The gap between `red` ending and `blue` beginning is the G's opening;
+    // the bar fills it.
+    private static let arcs: [(from: Double, to: Double, colour: UInt32)] = [
+        (  45, 135, 0x34A853),   // green  — bottom
+        ( 135, 212, 0xFBBC05),   // yellow — left
+        ( 212, 337, 0xEA4335),   // red    — top
+        ( 357, 405, 0x4285F4),   // blue   — right, continuing past 360
+    ]
+
     var body: some View {
         Canvas { ctx, size in
-            let r = min(size.width, size.height) / 2
+            let side = min(size.width, size.height)
+            let width = side * 0.26
+            // Radius to the centre of the stroke, so the mark fills the frame
+            // without the stroke spilling out of it.
+            let r = (side - width) / 2
             let c = CGPoint(x: size.width / 2, y: size.height / 2)
-            let quarters: [(Double, Double, Color)] = [
-                (-45,   45, Color(rgb: 0x4285F4)),   // blue, right
-                ( 45,  135, Color(rgb: 0x34A853)),   // green, bottom
-                (135,  200, Color(rgb: 0xFBBC05)),   // yellow, left
-                (200,  315, Color(rgb: 0xEA4335)),   // red, top
-            ]
-            for (from, to, colour) in quarters {
+
+            for arc in Self.arcs {
                 var p = Path()
-                p.addArc(center: c, radius: r * 0.78,
-                         startAngle: .degrees(from), endAngle: .degrees(to), clockwise: false)
-                ctx.stroke(p, with: .color(colour), style: StrokeStyle(lineWidth: r * 0.44))
+                p.addArc(center: c, radius: r,
+                         startAngle: .degrees(arc.from), endAngle: .degrees(arc.to),
+                         clockwise: false)
+                ctx.stroke(p, with: .color(Color(rgb: arc.colour)),
+                           style: StrokeStyle(lineWidth: width, lineCap: .butt))
             }
-            // The bar and the notch that make it a G rather than a ring.
-            ctx.fill(Path(CGRect(x: c.x, y: c.y - r * 0.20, width: r, height: r * 0.40)),
-                     with: .color(Color(rgb: 0x4285F4)))
-            ctx.fill(Path(CGRect(x: c.x + r * 0.30, y: c.y - r * 0.62,
-                                 width: r * 0.80, height: r * 0.44)),
-                     with: .color(.clear))
+
+            // The crossbar. It reaches from the centre out to the ring's outer
+            // edge, which is what turns the ring into a G.
+            ctx.fill(
+                Path(CGRect(x: c.x - width * 0.1, y: c.y - width / 2,
+                            width: r + width / 2 + width * 0.1, height: width)),
+                with: .color(Color(rgb: 0x4285F4))
+            )
         }
-        .frame(width: 15, height: 15)
+        .frame(width: 16, height: 16)
+        .accessibilityHidden(true)
     }
 }
 
