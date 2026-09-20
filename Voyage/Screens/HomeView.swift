@@ -55,6 +55,13 @@ struct HomeView: View {
             addButton
         }
         .onAppear { shown = true }
+        // Where a close button goes.
+        //
+        // One level, no stack: anything opened *from* a trip returns to that
+        // trip, and the trip itself returns home. Saving and closing had been
+        // going to different places from the same screen — Save landed on the
+        // trip, the close chevron went all the way home — which is what made
+        // the flow feel like it had no shape.
         .sheet(item: $model.route) { route in
             // A sheet is its own presentation container, so the
             // `preferredColorScheme` set on the root does not reach it — pick
@@ -76,11 +83,9 @@ struct HomeView: View {
                         trip: trip,
                         onChoose: { flight in
                             model.choose(flight, for: trip)
-                            // Back to the trip it belongs to, not all the way
-                            // home — the choice was made *for* that trip.
                             model.route = .detail(trip)
                         },
-                        onClose: { model.route = nil }
+                        onClose: { model.route = .detail(trip) }
                     )
                 case .stays(let trip):
                     StaysView(
@@ -89,12 +94,12 @@ struct HomeView: View {
                             model.choose(stay, for: trip)
                             model.route = .detail(trip)
                         },
-                        onClose: { model.route = nil }
+                        onClose: { model.route = .detail(trip) }
                     )
                 case .budget(let trip):
-                    BudgetView(trip: trip, onClose: { model.route = nil })
+                    BudgetView(trip: trip, onClose: { model.route = .detail(trip) })
                 case .documents(let trip):
-                    DocumentsView(trip: trip, onClose: { model.route = nil })
+                    DocumentsView(trip: trip, onClose: { model.route = .detail(trip) })
                 case .created(let trip):
                     TripCreatedView(
                         trip: model.trips.first { $0.id == trip.id } ?? trip,
@@ -104,7 +109,7 @@ struct HomeView: View {
                 case .saved:
                     SavedView(model: model,
                               onOpen: { model.route = .detail($0) },
-                              onClose: { model.route = nil })
+                              onClose: { model.route = .profile })
                 case .newTrip:
                     NewTripView(
                         onCreate: { trip in
