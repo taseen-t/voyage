@@ -90,7 +90,7 @@ struct FlightResultsView: View {
     }
 
     private var note: some View {
-        Text("Prices are illustrative. Sonder has no booking partner wired up yet, "
+        Text("Prices are illustrative. Voyage has no booking partner wired up yet, "
              + "so selecting a flight saves it to the trip rather than buying it.")
             .font(.system(size: 11))
             .foregroundStyle(Color.inkFaint)

@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct SonderApp: App {
+struct VoyageApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()

@@ -2,7 +2,7 @@ import SwiftUI
 
 /// The app mark.
 ///
-/// This is the supplied artwork (`Art/sonder-mark-source.png`), not a drawing
+/// This is the supplied artwork (`Art/voyage-mark-source.png`), not a drawing
 /// of it. `Tools/render-icon.sh` derives both the 1024px app icon and the
 /// 640px in-app asset from that one file, cropping the tile out of its white
 /// canvas and filling the rounded corners back in — so the icon on the home

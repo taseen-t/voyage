@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Report the vault's link islands, and assert Sonder is one of its own.
+"""Report the vault's link islands, and assert Voyage is one of its own.
 
-Sonder is deliberately unattached: nothing in /Sonder links out and nothing
+Voyage is deliberately unattached: nothing in /Voyage links out and nothing
 links in, so its cluster reads as a separate project at a glance instead of
 being pulled into Uplink's web through a shared hub. That property is invisible
 in the note text — one stray pair of brackets silently joins the two clusters
@@ -18,7 +18,7 @@ DEFAULT = "~/Desktop/Obsidian/Claude Apps"
 FENCE = re.compile(r"```.*?```", re.S)
 CODE = re.compile(r"`[^`\n]*`")
 LINK = re.compile(r"\[\[([^\]|#]+)(?:[#|][^\]]*)?\]\]")
-ISOLATED = "Sonder"          # the folder that must stand alone
+ISOLATED = "Voyage"          # the folder that must stand alone
 
 
 def main(argv: list[str]) -> int:

@@ -72,7 +72,7 @@ struct GlassButtonStyle: ButtonStyle {
 }
 
 /// The email field on the auth screen.
-struct SonderTextFieldStyle: TextFieldStyle {
+struct VoyageTextFieldStyle: TextFieldStyle {
     // swiftlint:disable:next identifier_name
     func _body(configuration: TextField<Self._Label>) -> some View {
         configuration

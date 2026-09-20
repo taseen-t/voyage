@@ -29,7 +29,7 @@ struct AuthView: View {
                 TextField("", text: $model.email,
                           prompt: Text("johndoe@acme.xyz")
                             .foregroundStyle(Color.inkFaint))
-                    .textFieldStyle(SonderTextFieldStyle())
+                    .textFieldStyle(VoyageTextFieldStyle())
                     .textContentType(.emailAddress)
                     .keyboardType(.emailAddress)
                     .textInputAutocapitalization(.never)

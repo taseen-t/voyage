@@ -42,7 +42,7 @@ struct StaysView: View {
                                    value: appeared)
                     }
 
-                    Text("Nothing here is bookable. Sonder has no accommodation "
+                    Text("Nothing here is bookable. Voyage has no accommodation "
                          + "partner, so choosing one saves it to the trip.")
                         .font(.system(size: 11))
                         .foregroundStyle(Color.inkFaint)

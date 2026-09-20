@@ -98,6 +98,7 @@ final class AppModel {
         case budget(Trip)
         case documents(Trip)
         case newTrip
+        case created(Trip)
         case profile
         case saved
 
@@ -109,11 +110,17 @@ final class AppModel {
             case .budget(let t): "budget-\(t.id)"
             case .documents(let t): "docs-\(t.id)"
             case .newTrip: "new"
+            case .created(let t): "created-\(t.id)"
             case .profile: "profile"
             case .saved: "saved"
             }
         }
     }
+
+    /// Set briefly after a trip is created, so the list can scroll to it and
+    /// flash it. Answers "where did it go" — the list is date-sorted, so a new
+    /// trip rarely lands where you are looking.
+    var highlight: Trip.ID?
 
     func add(_ trip: Trip) {
         trips.append(trip)
@@ -146,34 +153,34 @@ final class AppModel {
     }
 
     private enum Key {
-        static let onboarded = "sonder.hasOnboarded"
-        static let appearance = "sonder.appearance"
+        static let onboarded = "voyage.hasOnboarded"
+        static let appearance = "voyage.appearance"
     }
 
     #if DEBUG
-    /// Jump straight to a screen: `-sonderStep auth`, or
-    /// `-sonderStep onboarding -sonderPage 2`. Screenshotting six screens in
+    /// Jump straight to a screen: `-voyageStep auth`, or
+    /// `-voyageStep onboarding -voyagePage 2`. Screenshotting six screens in
     /// two themes is twelve launches; without this it is also sixty taps, and
     /// a tap that lands a pixel off silently captures the wrong screen.
     init(launchArguments: [String] = CommandLine.arguments) {
-        if let i = launchArguments.firstIndex(of: "-sonderStep"),
+        if let i = launchArguments.firstIndex(of: "-voyageStep"),
            i + 1 < launchArguments.count,
            let step = Step(rawValue: launchArguments[i + 1]) {
             self.step = step
             if step != .splash && step != .onboarding { markOnboarded() }
         }
-        if let i = launchArguments.firstIndex(of: "-sonderTheme"),
+        if let i = launchArguments.firstIndex(of: "-voyageTheme"),
            i + 1 < launchArguments.count,
            let a = Appearance(rawValue: launchArguments[i + 1]) {
             appearance = a
         }
-        if launchArguments.contains("-sonderTab"),
-           let i = launchArguments.firstIndex(of: "-sonderTab"),
+        if launchArguments.contains("-voyageTab"),
+           let i = launchArguments.firstIndex(of: "-voyageTab"),
            i + 1 < launchArguments.count,
            launchArguments[i + 1] == "past" {
             tab = .past
         }
-        if let i = launchArguments.firstIndex(of: "-sonderRoute"),
+        if let i = launchArguments.firstIndex(of: "-voyageRoute"),
            i + 1 < launchArguments.count {
             switch launchArguments[i + 1] {
             case "detail":  route = trips.first.map(Route.detail)
@@ -182,13 +189,14 @@ final class AppModel {
             case "budget":  route = trips.first.map(Route.budget)
             case "docs":    route = trips.first.map(Route.documents)
             case "new":     route = .newTrip
+            case "created": route = trips.first.map(Route.created)
             case "profile": route = .profile
             case "saved":   route = .saved
             default: break
             }
             if route != nil { step = .home; markOnboarded() }
         }
-        if let i = launchArguments.firstIndex(of: "-sonderPage"),
+        if let i = launchArguments.firstIndex(of: "-voyagePage"),
            i + 1 < launchArguments.count,
            let page = Int(launchArguments[i + 1]), (0...2).contains(page) {
             onboardingPage = page

@@ -1,10 +1,10 @@
-# Sonder
+# Voyage
 
 A native iOS trip planner, built in SwiftUI from a twelve-screen design and
 carried on into the screens that design implies — **fifteen screens, each in
 light, dark and system**, with **no third-party dependencies at all**.
 
-![Sonder, light and dark](Screenshots/contact-sheet.png)
+![Voyage, light and dark](Screenshots/contact-sheet.png)
 
 > **Every trip, one place.** Flights, stays, itineraries and budgets, instead
 > of a dozen browser tabs and a camera roll full of screenshots.
@@ -58,8 +58,8 @@ originals. Nothing is resampled at runtime. Provenance for every image is in
 **Screens are captured through debug launch arguments**, not by tapping:
 
 ```sh
--sonderStep onboarding -sonderPage 2
--sonderRoute flights
+-voyageStep onboarding -voyagePage 2
+-voyageRoute flights
 ```
 
 Twenty-two launches instead of a hundred-odd taps, and a tap landing a pixel
@@ -78,7 +78,7 @@ identical code.
 
 ```
 Art/          the supplied logo, the source the icon is derived from
-Sonder/
+Voyage/
   App/        @main, the step machine, the one observable model
   Design/     colour, type, controls, haptics
   Models/     Destination (the image seam), Trip, Flight, Itinerary
@@ -97,25 +97,25 @@ survives a relaunch. Selecting a flight saves
 it to the trip rather than buying it, and the screen says so — a checkout that
 appears to charge someone is worse than an honest dead end.
 
-The full list is kept honest in `Sonder open items` — see below.
+The full list is kept honest in `Voyage open items` — see below.
 
 ## Documentation
 
-Sonder's notes live in an Obsidian vault at `~/Desktop/Obsidian/Claude Apps`,
+Voyage's notes live in an Obsidian vault at `~/Desktop/Obsidian/Claude Apps`,
 in one graph alongside two other projects, so the lessons are shared rather
 than learned three times:
 
-- **Sonder** — the hub
-- **Sonder architecture** · **Sonder design system** · **Sonder mark** ·
-  **Sonder motion** · **Sonder photography** · **Sonder screens** ·
-  **Sonder open items**
+- **Voyage** — the hub
+- **Voyage architecture** · **Voyage design system** · **Voyage mark** ·
+  **Voyage motion** · **Voyage photography** · **Voyage screens** ·
+  **Voyage open items**
 
-Sonder is deliberately **its own island** in that graph: nothing in its folder
+Voyage is deliberately **its own island** in that graph: nothing in its folder
 links out and nothing links in, so its cluster reads as a separate project
 rather than being pulled into another app's web through a shared hub.
 
 Two checks keep that true — `Tools/check-vault-links.py` asserts every wikilink
-in the vault resolves, and `Tools/check-vault-islands.py` asserts Sonder is
+in the vault resolves, and `Tools/check-vault-islands.py` asserts Voyage is
 still unattached. One stray pair of brackets silently joins two clusters, and
 only a graph view would otherwise show it.
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Derive the app icon and the in-app mark from the source artwork.
 
-`Art/sonder-mark-source.png` is the supplied logo: the tile sits on a white
+`Art/voyage-mark-source.png` is the supplied logo: the tile sits on a white
 canvas with its own rounded corners. Neither output wants that white.
 
   * The **app icon** must be full-bleed and square. iOS applies the home screen
@@ -21,9 +21,9 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-SOURCE = ROOT / "Art/sonder-mark-source.png"
-ICON = ROOT / "Sonder/Assets.xcassets/AppIcon.appiconset/AppIcon.png"
-MARK = ROOT / "Sonder/Assets.xcassets/mark.imageset/mark.png"
+SOURCE = ROOT / "Art/voyage-mark-source.png"
+ICON = ROOT / "Voyage/Assets.xcassets/AppIcon.appiconset/AppIcon.png"
+MARK = ROOT / "Voyage/Assets.xcassets/mark.imageset/mark.png"
 
 # The tile's corner radius as a fraction of its side, measured off the artwork.
 CORNER = 0.223

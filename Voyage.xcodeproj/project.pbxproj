@@ -7,11 +7,11 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		DA0000000000000000000001 /* Sonder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sonder.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DA0000000000000000000001 /* Voyage.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Voyage.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		DA0000000000000000000002 /* Sonder */ = {isa = PBXFileSystemSynchronizedRootGroup; path = Sonder; sourceTree = "<group>"; };
+		DA0000000000000000000002 /* Voyage */ = {isa = PBXFileSystemSynchronizedRootGroup; path = Voyage; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -28,7 +28,7 @@
 		DA0000000000000000000004 = {
 			isa = PBXGroup;
 			children = (
-				DA0000000000000000000002 /* Sonder */,
+				DA0000000000000000000002 /* Voyage */,
 				DA0000000000000000000005 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -36,7 +36,7 @@
 		DA0000000000000000000005 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				DA0000000000000000000001 /* Sonder.app */,
+				DA0000000000000000000001 /* Voyage.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -44,9 +44,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		DA0000000000000000000006 /* Sonder */ = {
+		DA0000000000000000000006 /* Voyage */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = DA0000000000000000000010 /* Build configuration list for PBXNativeTarget "Sonder" */;
+			buildConfigurationList = DA0000000000000000000010 /* Build configuration list for PBXNativeTarget "Voyage" */;
 			buildPhases = (
 				DA0000000000000000000007 /* Sources */,
 				DA0000000000000000000003 /* Frameworks */,
@@ -57,13 +57,13 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				DA0000000000000000000002 /* Sonder */,
+				DA0000000000000000000002 /* Voyage */,
 			);
-			name = Sonder;
+			name = Voyage;
 			packageProductDependencies = (
 			);
-			productName = Sonder;
-			productReference = DA0000000000000000000001 /* Sonder.app */;
+			productName = Voyage;
+			productReference = DA0000000000000000000001 /* Voyage.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -81,7 +81,7 @@
 					};
 				};
 			};
-			buildConfigurationList = DA0000000000000000000013 /* Build configuration list for PBXProject "Sonder" */;
+			buildConfigurationList = DA0000000000000000000013 /* Build configuration list for PBXProject "Voyage" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -97,7 +97,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				DA0000000000000000000006 /* Sonder */,
+				DA0000000000000000000006 /* Voyage */,
 			);
 		};
 /* End PBXProject section */
@@ -132,7 +132,7 @@
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Sonder";
+				INFOPLIST_KEY_CFBundleDisplayName = "Voyage";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDefault;
@@ -142,7 +142,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.sonder.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.voyage.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -159,7 +159,7 @@
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Sonder";
+				INFOPLIST_KEY_CFBundleDisplayName = "Voyage";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDefault;
@@ -169,7 +169,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.sonder.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.voyage.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -237,7 +237,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		DA0000000000000000000010 /* Build configuration list for PBXNativeTarget "Sonder" */ = {
+		DA0000000000000000000010 /* Build configuration list for PBXNativeTarget "Voyage" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				DA0000000000000000000011 /* Debug */,
@@ -246,7 +246,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		DA0000000000000000000013 /* Build configuration list for PBXProject "Sonder" */ = {
+		DA0000000000000000000013 /* Build configuration list for PBXProject "Voyage" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				DA0000000000000000000014 /* Debug */,

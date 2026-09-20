@@ -14,6 +14,7 @@ struct HomeView: View {
         ZStack(alignment: .bottom) {
             Color.surface.ignoresSafeArea()
 
+            ScrollViewReader { proxy in
             ScrollView(showsIndicators: false) {
                 // Lazy, so a traveller with forty trips pays for the three on
                 // screen. Each card holds a decoded photograph; building them
@@ -26,6 +27,13 @@ struct HomeView: View {
                             onSave: { Haptics.tap(); model.toggleSaved(trip) },
                             onOpen: { open(.detail(trip)) },
                             onBook: { open(.flights(trip)) }
+                        )
+                        .id(trip.id)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: Metrics.cardRadius,
+                                             style: .continuous)
+                                .stroke(Color.accent, lineWidth: 3)
+                                .opacity(model.highlight == trip.id ? 1 : 0)
                         )
                         .onTapGesture { open(.detail(trip)) }
                         .opacity(shown ? 1 : 0)
@@ -41,6 +49,17 @@ struct HomeView: View {
                 .padding(.bottom, 96)   // clears the button floating over the list
             }
             .safeAreaInset(edge: .top, spacing: 0) { header }
+            .onChange(of: model.highlight) { _, id in
+                guard let id else { return }
+                withAnimation(.easeInOut(duration: 0.45)) {
+                    proxy.scrollTo(id, anchor: .center)
+                }
+                Task {
+                    try? await Task.sleep(for: .milliseconds(1400))
+                    withAnimation(.easeOut(duration: 0.4)) { model.highlight = nil }
+                }
+            }
+            }
 
             bottomFade
             addButton
@@ -64,6 +83,12 @@ struct HomeView: View {
                 BudgetView(trip: trip, onClose: { model.route = nil })
             case .documents(let trip):
                 DocumentsView(trip: trip, onClose: { model.route = nil })
+            case .created(let trip):
+                TripCreatedView(
+                    trip: model.trips.first { $0.id == trip.id } ?? trip,
+                    onOpen: { model.route = .detail(trip) },
+                    onDone: { model.route = nil; model.highlight = trip.id }
+                )
             case .saved:
                 SavedView(model: model,
                           onOpen: { model.route = .detail($0) },
@@ -72,7 +97,7 @@ struct HomeView: View {
                 NewTripView(
                     onCreate: { trip in
                         model.add(trip)
-                        model.route = nil
+                        model.route = .created(trip)
                     },
                     onClose: { model.route = nil }
                 )
