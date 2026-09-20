@@ -199,7 +199,85 @@ struct TripDetailView: View {
                     .animation(.easeOut(duration: 0.4).delay(0.12 + Double(i) * 0.05),
                                value: appeared)
             }
+
+            whatIsLeft
+                .padding(.horizontal, Metrics.gutter)
+                .padding(.top, 6)
         }
+    }
+
+    /// The end of the itinerary used to be the end of the screen — you read to
+    /// the last day and there was nowhere to go. This says what is still
+    /// missing and takes you there, from state the trip already holds.
+    @ViewBuilder
+    private var whatIsLeft: some View {
+        if trip.stay == nil {
+            nextStep("Nowhere to stay yet",
+                     "Pick one and it lands on day one.",
+                     "Choose a stay") { onSection(.stays(trip)) }
+        } else if trip.flight == nil {
+            nextStep("No flight yet",
+                     "Five options from LHR on your dates.",
+                     "See flights", action: onBook)
+        } else {
+            VStack(spacing: 5) {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 20))
+                    .foregroundStyle(Color(rgb: 0x2E9E5B))
+                Text("\(trip.destination.city) is planned.")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(Color.ink)
+                Text("Flight and stay are on day one. Nothing is actually booked "
+                     + "— there is no booking partner behind this.")
+                    .font(.system(size: 11))
+                    .foregroundStyle(Color.inkFaint)
+                    .multilineTextAlignment(.center)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 20)
+        }
+    }
+
+    /// The whole row is the control.
+    ///
+    /// It was a small `Button` with the padding, frame and background applied
+    /// *outside* it, which leaves the hit area as the bare text and the pill
+    /// drawn around something that is not tappable. The section tiles above get
+    /// this right — the button wraps its own styling — so this now matches them.
+    private func nextStep(_ title: String, _ detail: String, _ cta: String,
+                          action: @escaping () -> Void) -> some View {
+        Button {
+            Haptics.tap()
+            action()
+        } label: {
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(title)
+                        .font(.system(size: 13.5, weight: .semibold))
+                        .foregroundStyle(Color.ink)
+                    Text(detail)
+                        .font(.system(size: 11))
+                        .foregroundStyle(Color.inkFaint)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .multilineTextAlignment(.leading)
+
+                Spacer(minLength: 8)
+
+                Text(cta)
+                    .font(.system(size: 12.5, weight: .semibold))
+                    .foregroundStyle(Color.controlLabel)
+                    .padding(.horizontal, 14)
+                    .frame(height: 34)
+                    .background(Color.control, in: Capsule())
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity)
+            .background(Color.surfaceElevated,
+                        in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .contentShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: Chrome
@@ -289,7 +367,7 @@ struct TripDetailView: View {
                                              style: .continuous))
             .padding(.horizontal, Metrics.gutter)
             .padding(.bottom, 6)
-            .background(.bar)
+            .background(alignment: .bottom) { barFade }
         } else {
             Button(action: onBook) {
                 Label("Book a Flight", systemImage: "airplane.departure")
@@ -297,8 +375,26 @@ struct TripDetailView: View {
             .buttonStyle(PrimaryButtonStyle())
             .padding(.horizontal, Metrics.gutter)
             .padding(.bottom, 6)
-            .background(.bar)
+            .background(alignment: .bottom) { barFade }
         }
+    }
+
+    /// `.bar` draws a hard-edged band — near-black on the dark theme — with the
+    /// page visible either side of it. This is the same rising blur the home
+    /// list uses, which has no edge to see.
+    private var barFade: some View {
+        Rectangle()
+            .fill(.ultraThinMaterial)
+            .mask(
+                LinearGradient(stops: [
+                    .init(color: .clear, location: 0.0),
+                    .init(color: .black.opacity(0.7), location: 0.4),
+                    .init(color: .black, location: 0.75),
+                ], startPoint: .top, endPoint: .bottom)
+            )
+            .frame(height: 130)
+            .allowsHitTesting(false)
+            .ignoresSafeArea()
     }
 }
 
