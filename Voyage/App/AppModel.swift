@@ -141,6 +141,16 @@ final class AppModel {
         step = .onboarding
     }
 
+    func choose(_ flight: Flight, for trip: Trip) {
+        guard let i = trips.firstIndex(where: { $0.id == trip.id }) else { return }
+        trips[i].flight = flight
+    }
+
+    func choose(_ stay: Stay, for trip: Trip) {
+        guard let i = trips.firstIndex(where: { $0.id == trip.id }) else { return }
+        trips[i].stay = stay
+    }
+
     func toggleSaved(_ trip: Trip) {
         guard let i = trips.firstIndex(where: { $0.id == trip.id }) else { return }
         trips[i].isSaved.toggle()

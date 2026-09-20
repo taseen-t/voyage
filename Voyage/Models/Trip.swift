@@ -9,6 +9,11 @@ struct Trip: Identifiable, Hashable {
     /// as an `Int` keeps the formatter from ever inventing one.
     let budget: Int
     var isSaved: Bool
+    /// What has actually been chosen for this trip. Both stay `nil` until
+    /// someone picks one — the buttons that set them said "Save to trip" and
+    /// saved nothing at all until they existed.
+    var flight: Flight?
+    var stay: Stay?
 
     init(id: UUID = UUID(), destination: Destination, start: Date, end: Date,
          budget: Int, isSaved: Bool = false) {

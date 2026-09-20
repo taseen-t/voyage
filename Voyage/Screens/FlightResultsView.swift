@@ -7,10 +7,13 @@ import SwiftUI
 /// charge someone is worse than an honest dead end.
 struct FlightResultsView: View {
     let trip: Trip
+    var onChoose: (Flight) -> Void
     var onClose: () -> Void
 
-    init(trip: Trip, onClose: @escaping () -> Void) {
+    init(trip: Trip, onChoose: @escaping (Flight) -> Void,
+         onClose: @escaping () -> Void) {
         self.trip = trip
+        self.onChoose = onChoose
         self.onClose = onClose
         _flights = State(initialValue: Flight.options(for: trip))
     }
@@ -101,8 +104,9 @@ struct FlightResultsView: View {
 
     private var selectBar: some View {
         Button(selected == nil ? "Select a flight" : "Save to trip") {
+            guard let flight = flights.first(where: { $0.id == selected }) else { return }
             Haptics.confirm()
-            onClose()
+            onChoose(flight)
         }
         .buttonStyle(PrimaryButtonStyle())
         .disabled(selected == nil)

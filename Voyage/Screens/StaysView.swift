@@ -3,10 +3,13 @@ import SwiftUI
 /// Somewhere to sleep. Reached from the trip.
 struct StaysView: View {
     let trip: Trip
+    var onChoose: (Stay) -> Void
     var onClose: () -> Void
 
-    init(trip: Trip, onClose: @escaping () -> Void) {
+    init(trip: Trip, onChoose: @escaping (Stay) -> Void,
+         onClose: @escaping () -> Void) {
         self.trip = trip
+        self.onChoose = onChoose
         self.onClose = onClose
         _stays = State(initialValue: Stay.options(for: trip))
     }
@@ -58,7 +61,9 @@ struct StaysView: View {
         }
         .safeAreaInset(edge: .bottom) {
             Button(selected == nil ? "Select a stay" : "Save to trip") {
-                Haptics.confirm(); onClose()
+                guard let stay = stays.first(where: { $0.id == selected }) else { return }
+                Haptics.confirm()
+                onChoose(stay)
             }
             .buttonStyle(PrimaryButtonStyle())
             .disabled(selected == nil)

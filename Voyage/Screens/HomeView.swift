@@ -72,9 +72,25 @@ struct HomeView: View {
                         onSection: { model.route = $0 }
                     )
                 case .flights(let trip):
-                    FlightResultsView(trip: trip, onClose: { model.route = nil })
+                    FlightResultsView(
+                        trip: trip,
+                        onChoose: { flight in
+                            model.choose(flight, for: trip)
+                            // Back to the trip it belongs to, not all the way
+                            // home — the choice was made *for* that trip.
+                            model.route = .detail(trip)
+                        },
+                        onClose: { model.route = nil }
+                    )
                 case .stays(let trip):
-                    StaysView(trip: trip, onClose: { model.route = nil })
+                    StaysView(
+                        trip: trip,
+                        onChoose: { stay in
+                            model.choose(stay, for: trip)
+                            model.route = .detail(trip)
+                        },
+                        onClose: { model.route = nil }
+                    )
                 case .budget(let trip):
                     BudgetView(trip: trip, onClose: { model.route = nil })
                 case .documents(let trip):

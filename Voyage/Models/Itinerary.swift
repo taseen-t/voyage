@@ -50,8 +50,20 @@ extension ItineraryDay {
             var items: [ItineraryItem] = []
 
             if d == 0 {
-                items.append(.init(time: "09:40", title: "Fly to \(trip.destination.airport)", kind: .flight))
-                items.append(.init(time: "16:20", title: "Check in", kind: .stay))
+                // A chosen flight or stay replaces the placeholder line, so
+                // the itinerary shows what was actually picked rather than
+                // the choice vanishing the moment the sheet closed.
+                if let f = trip.flight {
+                    items.append(.init(time: TripFormat.time.string(from: f.departs),
+                                       title: "\(f.airline) \(f.number) to \(f.destination)",
+                                       kind: .flight))
+                } else {
+                    items.append(.init(time: "09:40",
+                                       title: "Fly to \(trip.destination.airport)", kind: .flight))
+                }
+                items.append(.init(time: "16:20",
+                                   title: trip.stay.map { "Check in at \($0.name)" } ?? "Check in",
+                                   kind: .stay))
                 items.append(.init(time: "19:30", title: meals[next(meals.count)], kind: .food))
             } else if d == days {
                 items.append(.init(time: "10:00", title: "Check out", kind: .stay))
