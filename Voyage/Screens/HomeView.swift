@@ -56,46 +56,54 @@ struct HomeView: View {
         }
         .onAppear { shown = true }
         .sheet(item: $model.route) { route in
-            switch route {
-            case .detail(let trip):
-                TripDetailView(
-                    trip: model.trips.first { $0.id == trip.id } ?? trip,
-                    onBook: { model.route = .flights(trip) },
-                    onSave: { Haptics.tap(); model.toggleSaved(trip) },
-                    onClose: { model.route = nil },
-                    onSection: { model.route = $0 }
-                )
-            case .flights(let trip):
-                FlightResultsView(trip: trip, onClose: { model.route = nil })
-            case .stays(let trip):
-                StaysView(trip: trip, onClose: { model.route = nil })
-            case .budget(let trip):
-                BudgetView(trip: trip, onClose: { model.route = nil })
-            case .documents(let trip):
-                DocumentsView(trip: trip, onClose: { model.route = nil })
-            case .created(let trip):
-                TripCreatedView(
-                    trip: model.trips.first { $0.id == trip.id } ?? trip,
-                    onOpen: { model.route = .detail(trip) },
-                    onDone: { model.route = nil; model.highlight = trip.id }
-                )
-            case .saved:
-                SavedView(model: model,
-                          onOpen: { model.route = .detail($0) },
-                          onClose: { model.route = nil })
-            case .newTrip:
-                NewTripView(
-                    onCreate: { trip in
-                        model.add(trip)
-                        model.route = .created(trip)
-                    },
-                    onClose: { model.route = nil }
-                )
-            case .profile:
-                ProfileView(model: model,
-                            onSaved: { model.route = .saved },
-                            onClose: { model.route = nil })
+            // A sheet is its own presentation container, so the
+            // `preferredColorScheme` set on the root does not reach it — pick
+            // Light on the account screen and the sheet it is sitting in stays
+            // dark. Re-declaring it here covers every sheet in the app,
+            // because they all come through this one presenter.
+            Group {
+                switch route {
+                case .detail(let trip):
+                    TripDetailView(
+                        trip: model.trips.first { $0.id == trip.id } ?? trip,
+                        onBook: { model.route = .flights(trip) },
+                        onSave: { Haptics.tap(); model.toggleSaved(trip) },
+                        onClose: { model.route = nil },
+                        onSection: { model.route = $0 }
+                    )
+                case .flights(let trip):
+                    FlightResultsView(trip: trip, onClose: { model.route = nil })
+                case .stays(let trip):
+                    StaysView(trip: trip, onClose: { model.route = nil })
+                case .budget(let trip):
+                    BudgetView(trip: trip, onClose: { model.route = nil })
+                case .documents(let trip):
+                    DocumentsView(trip: trip, onClose: { model.route = nil })
+                case .created(let trip):
+                    TripCreatedView(
+                        trip: model.trips.first { $0.id == trip.id } ?? trip,
+                        onOpen: { model.route = .detail(trip) },
+                        onDone: { model.route = nil; model.highlight = trip.id }
+                    )
+                case .saved:
+                    SavedView(model: model,
+                              onOpen: { model.route = .detail($0) },
+                              onClose: { model.route = nil })
+                case .newTrip:
+                    NewTripView(
+                        onCreate: { trip in
+                            model.add(trip)
+                            model.route = .created(trip)
+                        },
+                        onClose: { model.route = nil }
+                    )
+                case .profile:
+                    ProfileView(model: model,
+                                onSaved: { model.route = .saved },
+                                onClose: { model.route = nil })
+                }
             }
+            .preferredColorScheme(model.appearance.colorScheme)
         }
     }
 
