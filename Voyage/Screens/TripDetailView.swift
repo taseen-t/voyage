@@ -13,6 +13,9 @@ struct TripDetailView: View {
     var onSection: (AppModel.Route) -> Void
 
     @State private var appeared = false
+    /// The fade is only wanted once the photograph has scrolled away; over the
+    /// hero it would just dull the image.
+    @State private var scrolledPastHero = false
 
     private var days: [ItineraryDay] { ItineraryDay.plan(for: trip) }
 
@@ -31,6 +34,7 @@ struct TripDetailView: View {
             }
             .ignoresSafeArea(edges: .top)
 
+            topFade
             navBar
         }
         .safeAreaInset(edge: .bottom) { bookBar }
@@ -45,6 +49,10 @@ struct TripDetailView: View {
                 // Stretches rather than gapping when the scroll view is pulled
                 // down past its top.
                 let y = geo.frame(in: .global).minY
+                let _ = DispatchQueue.main.async {
+                    let past = y < -180
+                    if past != scrolledPastHero { scrolledPastHero = past }
+                }
                 Image(trip.destination.card)
                     .resizable()
                     .scaledToFill()
@@ -195,7 +203,31 @@ struct TripDetailView: View {
                          action: onSave)
         }
         .padding(.horizontal, Metrics.gutter)
-        .padding(.top, 4)
+        .padding(.top, Metrics.sheetTop)
+    }
+
+    /// Blur falling from the top edge, behind the nav buttons.
+    ///
+    /// The hero runs edge to edge by design, so the scroll passes under these
+    /// controls — and once it is the itinerary rather than the photograph
+    /// underneath, a day's number collided with the back button. Same idea as
+    /// the band at the bottom of the home list, the other way up.
+    private var topFade: some View {
+        Rectangle()
+            .fill(.ultraThinMaterial)
+            .mask(
+                LinearGradient(stops: [
+                    .init(color: .black, location: 0.0),
+                    .init(color: .black.opacity(0.65), location: 0.45),
+                    .init(color: .clear, location: 1.0),
+                ], startPoint: .top, endPoint: .bottom)
+            )
+            .frame(height: 96)
+            .frame(maxHeight: .infinity, alignment: .top)
+            .ignoresSafeArea()
+            .allowsHitTesting(false)
+            .opacity(scrolledPastHero ? 1 : 0)
+            .animation(.easeInOut(duration: 0.2), value: scrolledPastHero)
     }
 
     private func circleButton(_ symbol: String, label: String,

@@ -87,4 +87,10 @@ enum Metrics {
     /// Photo tiles in the onboarding illustrations.
     static let tileRadius: CGFloat = 13
     static let iconTile: CGFloat = 78
+    /// Headroom at the top of a sheet.
+    ///
+    /// A sheet gets no status-bar safe area — its content begins at the sheet's
+    /// own rounded edge — so a header written the same way as the root screen's
+    /// sits hard against it and the first control is clipped by the corner.
+    static let sheetTop: CGFloat = 14
 }

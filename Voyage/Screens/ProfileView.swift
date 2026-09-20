@@ -97,6 +97,7 @@ struct ProfileView: View {
                     .accessibilityLabel("Close")
                 }
                 .padding(.horizontal, Metrics.gutter)
+                .padding(.top, Metrics.sheetTop)
                 .padding(.bottom, 6)
                 .background(Color.surface)
             }

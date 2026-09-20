@@ -77,6 +77,7 @@ struct NewTripView: View {
                 .contentTransition(.opacity)
         }
         .padding(.horizontal, Metrics.gutter)
+        .padding(.top, Metrics.sheetTop)
         .padding(.bottom, 18)
         .animation(.spring(response: 0.4, dampingFraction: 0.85), value: stage)
     }

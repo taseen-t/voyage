@@ -57,11 +57,15 @@ extension ItineraryDay {
                 items.append(.init(time: "10:00", title: "Check out", kind: .stay))
                 items.append(.init(time: "14:15", title: "Fly home", kind: .flight))
             } else {
+                // The afternoon outing steps off the morning's rather than
+                // drawing again, so a day cannot list the same place twice.
+                let morning = next(outings.count)
                 items.append(.init(time: "09:00", title: meals[0], kind: .food))
-                items.append(.init(time: "10:30", title: outings[next(outings.count)], kind: .activity))
+                items.append(.init(time: "10:30", title: outings[morning], kind: .activity))
                 items.append(.init(time: "13:30", title: meals[1 + next(meals.count - 1)], kind: .food))
                 if next(3) != 0 {
-                    items.append(.init(time: "16:00", title: outings[next(outings.count)], kind: .activity))
+                    let afternoon = (morning + 1 + next(outings.count - 1)) % outings.count
+                    items.append(.init(time: "16:00", title: outings[afternoon], kind: .activity))
                 }
             }
             return ItineraryDay(number: d + 1, date: date, items: items)

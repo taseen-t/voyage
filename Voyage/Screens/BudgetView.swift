@@ -59,6 +59,7 @@ struct BudgetView: View {
             .accessibilityLabel("Close")
         }
         .padding(.horizontal, Metrics.gutter)
+        .padding(.top, Metrics.sheetTop)
         .padding(.bottom, 12)
         .background(Color.surface)
     }

@@ -64,6 +64,7 @@ struct DocumentsView: View {
                 .foregroundStyle(Color.inkFaint)
         }
         .padding(.horizontal, Metrics.gutter)
+        .padding(.top, Metrics.sheetTop)
         .padding(.bottom, 14)
         .background(Color.surface)
     }
