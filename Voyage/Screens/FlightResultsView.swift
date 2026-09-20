@@ -28,7 +28,8 @@ struct FlightResultsView: View {
 
 
     var body: some View {
-        ZStack(alignment: .top) {
+        ZStack(alignment: .bottom) {
+          ZStack(alignment: .top) {
             Color.surface.ignoresSafeArea()
 
             ScrollView(showsIndicators: false) {
@@ -50,11 +51,14 @@ struct FlightResultsView: View {
                 }
                 .padding(.horizontal, Metrics.gutter)
                 .padding(.top, 8)
-                .padding(.bottom, 100)
+                .padding(.bottom, 132)
             }
             .safeAreaInset(edge: .top, spacing: 0) { header }
         }
-        .safeAreaInset(edge: .bottom) { selectBar }
+
+            BottomFade()
+            selectBar
+        }
         .onAppear { appeared = true }
     }
 
@@ -103,7 +107,7 @@ struct FlightResultsView: View {
     }
 
     private var selectBar: some View {
-        Button(selected == nil ? "Select a flight" : "Save to trip") {
+        Button(selected == nil ? "Select a flight" : "Add to trip") {
             guard let flight = flights.first(where: { $0.id == selected }) else { return }
             Haptics.confirm()
             onChoose(flight)
@@ -112,7 +116,6 @@ struct FlightResultsView: View {
         .disabled(selected == nil)
         .padding(.horizontal, Metrics.gutter)
         .padding(.bottom, 6)
-        .background(.bar)
     }
 }
 

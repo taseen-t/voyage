@@ -45,6 +45,12 @@ extension ItineraryDay {
         let outings = trip.destination.outings
         let meals = ["Breakfast nearby", "Long lunch", "Dinner booked", "Street food crawl"]
 
+        // Ninety minutes after landing, or the old placeholder when no flight
+        // has been chosen yet.
+        let checkIn = trip.flight.map { calendar.date(byAdding: .minute, value: 90,
+                                                      to: $0.arrives) ?? $0.arrives }
+        let checkInTime = checkIn.map { TripFormat.time.string(from: $0) } ?? "16:20"
+
         return (0...days).map { d in
             let date = calendar.date(byAdding: .day, value: d, to: trip.start) ?? trip.start
             var items: [ItineraryItem] = []
@@ -61,10 +67,21 @@ extension ItineraryDay {
                     items.append(.init(time: "09:40",
                                        title: "Fly to \(trip.destination.airport)", kind: .flight))
                 }
-                items.append(.init(time: "16:20",
+                // Check-in follows the flight rather than sitting at a fixed
+                // 16:20 — a red-eye landing at 01:00 had you checking in ten
+                // minutes *before* take-off.
+                if checkIn == nil || calendar.isDate(checkIn!, inSameDayAs: date) {
+                    items.append(.init(time: checkInTime,
+                                       title: trip.stay.map { "Check in at \($0.name)" } ?? "Check in",
+                                       kind: .stay))
+                }
+                items.append(.init(time: "19:30", title: meals[next(meals.count)], kind: .food))
+            } else if let checkIn, calendar.isDate(checkIn, inSameDayAs: date), d < days {
+                items.append(.init(time: checkInTime,
                                    title: trip.stay.map { "Check in at \($0.name)" } ?? "Check in",
                                    kind: .stay))
-                items.append(.init(time: "19:30", title: meals[next(meals.count)], kind: .food))
+                items.append(.init(time: "09:00", title: meals[0], kind: .food))
+                items.append(.init(time: "13:30", title: outings[next(outings.count)], kind: .activity))
             } else if d == days {
                 items.append(.init(time: "10:00", title: "Check out", kind: .stay))
                 items.append(.init(time: "14:15", title: "Fly home", kind: .flight))

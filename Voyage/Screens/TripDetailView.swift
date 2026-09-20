@@ -39,7 +39,7 @@ struct TripDetailView: View {
                 navBar
             }
 
-            barFade
+            BottomFade()
             bookBar
         }
         .onAppear { withAnimation(.easeOut(duration: 0.45).delay(0.05)) { appeared = true } }
@@ -379,31 +379,6 @@ struct TripDetailView: View {
             .padding(.horizontal, Metrics.gutter)
             .padding(.bottom, 6)
         }
-    }
-
-    /// Blur rising from the **physical** bottom edge.
-    ///
-    /// Two earlier attempts leaked. `.bar` drew a hard near-black band with the
-    /// page visible either side of it; a masked fade in the bar's own
-    /// `background` could not reach past the safe-area inset the bar lived in,
-    /// so the itinerary carried on below the card. This is the home list's
-    /// band, which had both problems and neither now.
-    private var barFade: some View {
-        Rectangle()
-            .fill(.regularMaterial)
-            .mask(
-                LinearGradient(stops: [
-                    .init(color: .clear, location: 0.00),
-                    .init(color: .black.opacity(0.22), location: 0.26),
-                    .init(color: .black.opacity(0.72), location: 0.52),
-                    .init(color: .black, location: 0.74),
-                    .init(color: .black, location: 1.00),
-                ], startPoint: .top, endPoint: .bottom)
-            )
-            .frame(height: 160)
-            .frame(maxHeight: .infinity, alignment: .bottom)
-            .ignoresSafeArea()
-            .allowsHitTesting(false)
     }
 }
 

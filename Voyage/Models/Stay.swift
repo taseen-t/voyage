@@ -5,8 +5,8 @@ import SwiftUI
 /// Hardcoded, like the flights: there is no supplier behind this and inventing
 /// one in the interface would be the lie. Names and areas are generated from
 /// the destination so a stay in Kyoto is not offered on a street in Lisbon.
-struct Stay: Identifiable, Hashable {
-    enum Kind: String, CaseIterable {
+struct Stay: Identifiable, Hashable, Codable {
+    enum Kind: String, CaseIterable, Codable {
         case hotel, apartment, ryokan, cabin, villa, hostel
 
         var label: String {

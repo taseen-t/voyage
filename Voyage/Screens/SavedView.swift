@@ -5,6 +5,7 @@ import SwiftUI
 struct SavedView: View {
     @Bindable var model: AppModel
     var onOpen: (Trip) -> Void
+    var onHome: () -> Void
     var onClose: () -> Void
 
     private var saved: [Trip] {
@@ -26,6 +27,10 @@ struct SavedView: View {
                             .transition(.opacity.combined(with: .scale(scale: 0.97)))
                     }
                     if saved.isEmpty { empty }
+
+                    Button("Back to home", action: onHome)
+                        .buttonStyle(ProviderButtonStyle())
+                        .padding(.top, 8)
                 }
                 .padding(.horizontal, Metrics.gutter)
                 .padding(.top, 6)

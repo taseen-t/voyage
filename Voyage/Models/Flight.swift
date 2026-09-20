@@ -1,6 +1,6 @@
 import Foundation
 
-struct Flight: Identifiable, Hashable {
+struct Flight: Identifiable, Hashable, Codable {
     let airline: String
     let number: String
     let origin: String

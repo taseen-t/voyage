@@ -9,7 +9,7 @@ import SwiftUI
 /// photography means replacing two files per case and touching no view.
 ///
 /// All twelve are CC0. Provenance is in `CREDITS.json` at the repository root.
-enum Destination: String, CaseIterable, Identifiable {
+enum Destination: String, CaseIterable, Identifiable, Codable {
     case kyoto, lisbon, fuji, banff, santorini, iceland
     case norway, queenstown, hallstatt, marrakesh, dolomites, cappadocia
 

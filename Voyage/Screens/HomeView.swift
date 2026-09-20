@@ -51,7 +51,7 @@ struct HomeView: View {
             }
             }
 
-            bottomFade
+            BottomFade(height: 150)
             addButton
         }
         .onAppear { shown = true }
@@ -83,7 +83,7 @@ struct HomeView: View {
                         trip: trip,
                         onChoose: { flight in
                             model.choose(flight, for: trip)
-                            model.route = .detail(trip)
+                            model.route = .confirm(trip)
                         },
                         onClose: { model.route = .detail(trip) }
                     )
@@ -92,7 +92,7 @@ struct HomeView: View {
                         trip: trip,
                         onChoose: { stay in
                             model.choose(stay, for: trip)
-                            model.route = .detail(trip)
+                            model.route = .confirm(trip)
                         },
                         onClose: { model.route = .detail(trip) }
                     )
@@ -106,10 +106,29 @@ struct HomeView: View {
                         onOpen: { model.route = .detail(trip) },
                         onDone: { model.route = nil; model.highlight = trip.id }
                     )
-                case .saved:
+                case .confirm(let trip):
+                    // Re-read the trip: the payload was captured before the
+                    // choice that triggered this screen was written.
+                    let live = model.trips.first { $0.id == trip.id } ?? trip
+                    TripConfirmView(
+                        trip: live,
+                        onContinue: {
+                            if live.flight != nil && live.stay != nil {
+                                model.markSaved(live)
+                                model.route = .saved(fromProfile: false)
+                            } else if live.flight != nil {
+                                model.route = .stays(live)
+                            } else {
+                                model.route = .flights(live)
+                            }
+                        },
+                        onHome: { model.route = nil }
+                    )
+            case .saved(let fromProfile):
                     SavedView(model: model,
                               onOpen: { model.route = .detail($0) },
-                              onClose: { model.route = .profile })
+                              onHome: { model.route = nil },
+                              onClose: { model.route = fromProfile ? .profile : nil })
                 case .newTrip:
                     NewTripView(
                         onCreate: { trip in
@@ -120,7 +139,7 @@ struct HomeView: View {
                     )
                 case .profile:
                     ProfileView(model: model,
-                                onSaved: { model.route = .saved },
+                                onSaved: { model.route = .saved(fromProfile: true) },
                                 onClose: { model.route = nil })
                 }
             }
@@ -197,37 +216,6 @@ struct HomeView: View {
         }
         .padding(3)
         .background(Capsule().fill(Color.fieldFill))
-    }
-
-    /// Blur rising from the bottom edge, so the add button always has the
-    /// same backdrop no matter which photograph has scrolled under it.
-    ///
-    /// The band is pinned to the **physical** bottom, not the safe area's.
-    /// A fixed-height view aligned to the bottom of a safe-area-respecting
-    /// stack stops short of the home indicator, which left the last card
-    /// rendering sharp underneath it — the blur then read as a grey rectangle
-    /// laid over the photograph rather than as the screen edge softening.
-    private var bottomFade: some View {
-        Rectangle()
-            // Thicker than the glass used on the cards: this one has to make
-            // whatever scrolls under it read as texture rather than as a
-            // headline competing with the button on top of it.
-            .fill(.regularMaterial)
-            .mask(
-                // A long, soft ramp. The earlier one reached full strength by
-                // 45% of a short band, so its leading edge was a visible line.
-                LinearGradient(stops: [
-                    .init(color: .clear, location: 0.00),
-                    .init(color: .black.opacity(0.22), location: 0.26),
-                    .init(color: .black.opacity(0.72), location: 0.52),
-                    .init(color: .black, location: 0.74),
-                    .init(color: .black, location: 1.00),
-                ], startPoint: .top, endPoint: .bottom)
-            )
-            .frame(height: 150)
-            .frame(maxHeight: .infinity, alignment: .bottom)
-            .ignoresSafeArea()
-            .allowsHitTesting(false)
     }
 
     private var addButton: some View {

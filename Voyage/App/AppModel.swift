@@ -54,7 +54,12 @@ final class AppModel {
     var onboardingPage = 0
     var email = ""
     var tab: HomeTab = .upcoming
-    var trips: [Trip] = Trip.sample
+    /// Restored from disk, falling back to the sample itinerary on a first
+    /// run. Every mutation writes straight back — the set is small enough that
+    /// batching the writes would be optimising nothing.
+    var trips: [Trip] = TripStore.load() ?? Trip.sample {
+        didSet { TripStore.save(trips) }
+    }
 
     /// Persisted, unlike almost everything else here: a theme someone chose
     /// and then had to choose again on every launch is worse than not offering
@@ -99,8 +104,10 @@ final class AppModel {
         case documents(Trip)
         case newTrip
         case created(Trip)
+        case confirm(Trip)
         case profile
-        case saved
+        /// `fromProfile` decides where its close button goes.
+        case saved(fromProfile: Bool)
 
         var id: String {
             switch self {
@@ -111,8 +118,9 @@ final class AppModel {
             case .documents(let t): "docs-\(t.id)"
             case .newTrip: "new"
             case .created(let t): "created-\(t.id)"
+            case .confirm(let t): "confirm-\(t.id)"
             case .profile: "profile"
-            case .saved: "saved"
+            case .saved(let p): "saved-\(p)"
             }
         }
     }
@@ -132,6 +140,7 @@ final class AppModel {
     func reset() {
         // Appearance is deliberately kept: it is a preference, not session state.
         UserDefaults.standard.removeObject(forKey: Key.onboarded)
+        TripStore.clear()
         hasOnboarded = false
         trips = Trip.sample
         email = ""
@@ -149,6 +158,11 @@ final class AppModel {
     func choose(_ stay: Stay, for trip: Trip) {
         guard let i = trips.firstIndex(where: { $0.id == trip.id }) else { return }
         trips[i].stay = stay
+    }
+
+    func markSaved(_ trip: Trip) {
+        guard let i = trips.firstIndex(where: { $0.id == trip.id }) else { return }
+        trips[i].isSaved = true
     }
 
     func toggleSaved(_ trip: Trip) {
@@ -201,7 +215,7 @@ final class AppModel {
             case "new":     route = .newTrip
             case "created": route = trips.first.map(Route.created)
             case "profile": route = .profile
-            case "saved":   route = .saved
+            case "saved":   route = .saved(fromProfile: true)
             default: break
             }
             if route != nil { step = .home; markOnboarded() }

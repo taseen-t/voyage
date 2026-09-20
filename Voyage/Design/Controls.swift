@@ -86,3 +86,34 @@ struct VoyageTextFieldStyle: TextFieldStyle {
             )
     }
 }
+
+/// Blur rising from the **physical** bottom edge, behind a floating control.
+///
+/// Pinned past the safe area rather than attached to the control it sits under.
+/// A bar in a `safeAreaInset` is laid out *inside* that inset, so a background
+/// it carries stops there and the page keeps going below it — which is how the
+/// trip detail ended up with its itinerary legible under the flight card.
+///
+/// `.regularMaterial`, not `.ultraThin`: this has to turn what scrolls under it
+/// into texture rather than leave it competing with the control on top.
+struct BottomFade: View {
+    var height: CGFloat = 160
+
+    var body: some View {
+        Rectangle()
+            .fill(.regularMaterial)
+            .mask(
+                LinearGradient(stops: [
+                    .init(color: .clear, location: 0.00),
+                    .init(color: .black.opacity(0.22), location: 0.26),
+                    .init(color: .black.opacity(0.72), location: 0.52),
+                    .init(color: .black, location: 0.74),
+                    .init(color: .black, location: 1.00),
+                ], startPoint: .top, endPoint: .bottom)
+            )
+            .frame(height: height)
+            .frame(maxHeight: .infinity, alignment: .bottom)
+            .ignoresSafeArea()
+            .allowsHitTesting(false)
+    }
+}

@@ -27,7 +27,8 @@ struct StaysView: View {
     }
 
     var body: some View {
-        ZStack {
+        ZStack(alignment: .bottom) {
+          ZStack {
             Color.surface.ignoresSafeArea()
 
             ScrollView(showsIndicators: false) {
@@ -55,12 +56,14 @@ struct StaysView: View {
                 }
                 .padding(.horizontal, Metrics.gutter)
                 .padding(.top, 8)
-                .padding(.bottom, 100)
+                .padding(.bottom, 132)
             }
             .safeAreaInset(edge: .top, spacing: 0) { header }
         }
-        .safeAreaInset(edge: .bottom) {
-            Button(selected == nil ? "Select a stay" : "Save to trip") {
+
+            BottomFade()
+
+            Button(selected == nil ? "Select a stay" : "Add to trip") {
                 guard let stay = stays.first(where: { $0.id == selected }) else { return }
                 Haptics.confirm()
                 onChoose(stay)
@@ -69,7 +72,6 @@ struct StaysView: View {
             .disabled(selected == nil)
             .padding(.horizontal, Metrics.gutter)
             .padding(.bottom, 6)
-            .background(.bar)
         }
         .onAppear { appeared = true }
     }
