@@ -44,5 +44,6 @@ for theme in light dark; do
     shoot "$theme-13-documents"  2.4 -voyageTheme "$theme" -voyageRoute docs
     shoot "$theme-14-profile"    2.4 -voyageTheme "$theme" -voyageRoute profile
     shoot "$theme-15-saved"      2.4 -voyageTheme "$theme" -voyageRoute saved
+    shoot "$theme-16-created"    2.4 -voyageTheme "$theme" -voyageRoute created
 done
 echo "wrote $(ls "$out" | wc -l | tr -d ' ') screenshots to Screenshots/"
