@@ -143,9 +143,9 @@ struct TripDetailView: View {
     /// had nowhere to send anyone.
     private var sections: some View {
         HStack(spacing: 10) {
-            section("Stays", "bed.double") { onSection(.stays(trip)) }
-            section("Budget", "creditcard") { onSection(.budget(trip)) }
-            section("Documents", "doc.text") { onSection(.documents(trip)) }
+            section("Stays", "bed.double", value: trip.stay?.name) { onSection(.stays(trip)) }
+            section("Budget", "creditcard", value: trip.budgetLabel) { onSection(.budget(trip)) }
+            section("Documents", "doc.text", value: nil) { onSection(.documents(trip)) }
         }
         .padding(.horizontal, Metrics.gutter)
         .padding(.bottom, 22)
@@ -153,19 +153,29 @@ struct TripDetailView: View {
         .offset(y: appeared ? 0 : 10)
     }
 
-    private func section(_ title: String, _ symbol: String,
+    /// `value` is what has been chosen, if anything. A tile that looks the
+    /// same before and after a choice is why the flow read as a loop.
+    private func section(_ title: String, _ symbol: String, value: String?,
                          action: @escaping () -> Void) -> some View {
         Button(action: { Haptics.tap(); action() }) {
-            VStack(spacing: 7) {
+            VStack(spacing: 5) {
                 Image(systemName: symbol)
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(Color.ink)
                 Text(title)
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(Color.inkMuted)
+                if let value {
+                    Text(value)
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundStyle(Color.ink)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                        .padding(.horizontal, 6)
+                }
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 15)
+            .padding(.vertical, 13)
             .background(Color.surfaceElevated,
                         in: RoundedRectangle(cornerRadius: 14, style: .continuous))
         }
@@ -241,14 +251,54 @@ struct TripDetailView: View {
         .accessibilityLabel(label)
     }
 
+    /// Reflects whether a flight has been chosen.
+    ///
+    /// It used to read "Book a Flight" forever, so saving one returned you to a
+    /// bar inviting you to do the thing you had just done — a loop with no
+    /// exit and no sign anything had happened.
+    @ViewBuilder
     private var bookBar: some View {
-        Button(action: onBook) {
-            Label("Book a Flight", systemImage: "airplane.departure")
+        if let flight = trip.flight {
+            HStack(spacing: 12) {
+                Image(systemName: "checkmark")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(Color.controlLabel)
+                    .frame(width: 24, height: 24)
+                    .background(Color(rgb: 0x2E9E5B), in: Circle())
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("\(flight.airline) \(flight.number)")
+                        .font(.system(size: 13.5, weight: .semibold))
+                        .foregroundStyle(Color.ink)
+                    Text("\(flight.window) · \(flight.stopsLabel) · \(Money.label(flight.price))")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(Color.inkFaint)
+                }
+
+                Spacer(minLength: 8)
+
+                Button("Change", action: onBook)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(Color.ink)
+                    .buttonStyle(.plain)
+            }
+            .padding(.horizontal, 16)
+            .frame(height: Metrics.buttonHeight)
+            .background(Color.surfaceElevated,
+                        in: RoundedRectangle(cornerRadius: Metrics.buttonRadius,
+                                             style: .continuous))
+            .padding(.horizontal, Metrics.gutter)
+            .padding(.bottom, 6)
+            .background(.bar)
+        } else {
+            Button(action: onBook) {
+                Label("Book a Flight", systemImage: "airplane.departure")
+            }
+            .buttonStyle(PrimaryButtonStyle())
+            .padding(.horizontal, Metrics.gutter)
+            .padding(.bottom, 6)
+            .background(.bar)
         }
-        .buttonStyle(PrimaryButtonStyle())
-        .padding(.horizontal, Metrics.gutter)
-        .padding(.bottom, 6)
-        .background(.bar)
     }
 }
 
